@@ -5,7 +5,7 @@ import dto.TransitionDTO;
 
 public class FiniteAutomataService {
 
-    public static FiniteAutomataDTO union(FiniteAutomataDTO finiteAutomata1, FiniteAutomataDTO finiteAutomata2) {
+    public FiniteAutomataDTO union(FiniteAutomataDTO finiteAutomata1, FiniteAutomataDTO finiteAutomata2) {
         FiniteAutomataDTO finalFiniteAutomata = new FiniteAutomataDTO();
         int shift = finiteAutomata1.getNStates() + 1;
 
