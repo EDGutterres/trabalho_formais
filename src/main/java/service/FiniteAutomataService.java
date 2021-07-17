@@ -33,6 +33,15 @@ public class FiniteAutomataService {
             transition.setStateTo(transition.getStateTo() + shift);
         });
 
+        finalFiniteAutomata.setAlphabet(finiteAutomata1.getAlphabet());
+        finiteAutomata2.getAlphabet().forEach(symbol -> {
+            if (!finalFiniteAutomata.getAlphabet().contains(symbol)) {
+                finalFiniteAutomata.getAlphabet().add(symbol);
+            }
+        });
+        if (!finalFiniteAutomata.getAlphabet().contains('&')) {
+            finalFiniteAutomata.getAlphabet().add('&');
+        }
         finalFiniteAutomata.setStateList(finiteAutomata1.getStateList());
         finalFiniteAutomata.getStateList().addAll(finiteAutomata2.getStateList());
         finalFiniteAutomata.getStateList().add(0, 0);
