@@ -13,12 +13,12 @@ import lombok.Setter;
 @NoArgsConstructor
 public class FiniteAutomataDTO {
 
-    public int nStates;
-    public List<Integer> stateList;
-    public Integer initialState;
-    public List<Integer> acceptanceStates;
-    public List<Character> alphabet;
-    public List<TransitionDTO> transitionList;
-    public boolean isNonDeterministic;
+    private int nStates;
+    private List<Integer> stateList;
+    private Integer initialState;
+    private List<Integer> acceptanceStates;
+    private List<Character> alphabet;
+    private List<TransitionDTO> transitionList;
+    private boolean isNonDeterministic;
 
 }
