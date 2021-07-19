@@ -3,14 +3,15 @@ package service;
 import dto.FiniteAutomataDTO;
 import dto.TransitionDTO;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class FiniteAutomataService {
 
     public FiniteAutomataDTO union(FiniteAutomataDTO finiteAutomata1, FiniteAutomataDTO finiteAutomata2) {
         FiniteAutomataDTO finalFiniteAutomata = new FiniteAutomataDTO();
-        refactorAutomatons(finiteAutomata1, finiteAutomata2);
+        refactorAutomata(finiteAutomata1, 1);
+        refactorAutomata(finiteAutomata2, finiteAutomata1.getNStates()+1);
 
         finalFiniteAutomata.setAlphabet(new ArrayList<>(finiteAutomata1.getAlphabet()));
         finiteAutomata2.getAlphabet().forEach(symbol -> {
@@ -40,31 +41,150 @@ public class FiniteAutomataService {
         return finalFiniteAutomata;
     }
 
-    private void refactorAutomatons(FiniteAutomataDTO finiteAutomata1, FiniteAutomataDTO finiteAutomata2) {
-        int shift = finiteAutomata1.getNStates() + 1;
+    private void refactorAutomata(FiniteAutomataDTO finiteAutomata, int shift) {
 
-        for (int i = 0; i < finiteAutomata1.getNStates(); i++) {
-            finiteAutomata1.getStateList().set(i, finiteAutomata1.getStateList().get(i)+1);
+        for (int i = 0; i < finiteAutomata.getNStates(); i++) {
+            finiteAutomata.getStateList().set(i, finiteAutomata.getStateList().get(i)+shift);
         }
-        for (int i = 0; i < finiteAutomata1.getAcceptanceStates().size(); i++) {
-            finiteAutomata1.getAcceptanceStates().set(i, finiteAutomata1.getAcceptanceStates().get(i)+1);
+        for (int i = 0; i < finiteAutomata.getAcceptanceStates().size(); i++) {
+            finiteAutomata.getAcceptanceStates().set(i, finiteAutomata.getAcceptanceStates().get(i)+shift);
         }
-        finiteAutomata1.setInitialState(finiteAutomata1.getInitialState() + 1);
-        finiteAutomata1.getTransitionList().forEach(transition -> {
-            transition.setStateFrom(transition.getStateFrom() + 1);
-            transition.setStateTo(transition.getStateTo() + 1);
-        });
-
-        for (int i = 0; i < finiteAutomata2.getNStates(); i++) {
-            finiteAutomata2.getStateList().set(i, finiteAutomata2.getStateList().get(i)+shift);
-        }
-        for (int i = 0; i < finiteAutomata2.getAcceptanceStates().size(); i++) {
-            finiteAutomata2.getAcceptanceStates().set(i, finiteAutomata2.getAcceptanceStates().get(i)+shift);
-        }
-        finiteAutomata2.setInitialState(finiteAutomata2.getInitialState() + shift);
-        finiteAutomata2.getTransitionList().forEach(transition -> {
+        finiteAutomata.setInitialState(finiteAutomata.getInitialState() + shift);
+        finiteAutomata.getTransitionList().forEach(transition -> {
             transition.setStateFrom(transition.getStateFrom() + shift);
             transition.setStateTo(transition.getStateTo() + shift);
         });
+    }
+
+    public FiniteAutomataDTO determinize(FiniteAutomataDTO finiteAutomata) {
+        if (!finiteAutomata.isNonDeterministic()) {
+            return finiteAutomata;
+        }
+        FiniteAutomataDTO determinizedAutomata = new FiniteAutomataDTO();
+
+        Map<Integer, List<Integer>> epsilonSet = calculateEpsilonSet(finiteAutomata);
+        defineTransitions(finiteAutomata, determinizedAutomata, epsilonSet);
+        determinizedAutomata.setNonDeterministic(false);
+        return determinizedAutomata;
+    }
+
+
+
+    private void defineTransitions(FiniteAutomataDTO finiteAutomata, FiniteAutomataDTO determinizedAutomata, Map<Integer, List<Integer>> epsilonSet) {
+        List<Integer> newAcceptanceStates = new ArrayList<>();
+        List<Integer> newStateList = new ArrayList<>();
+        Integer currentState = finiteAutomata.getInitialState();
+        Integer newStates = currentState;
+        Integer newInitialState = currentState;
+        List<TransitionDTO> newTransitionList = new ArrayList<>();
+        List<TransitionDTO> oldTransitionList = finiteAutomata.getTransitionList();
+        Map<Character, List<Integer>> characterListMap;
+        boolean firstLoop = true;
+        List<Integer> reachableStates = new ArrayList<>(epsilonSet.get(finiteAutomata.getInitialState()));
+        Map<Integer, List<Integer>> stateListMap = new HashMap<>();
+        Map<Integer, Boolean> modifiedStatesMap = new HashMap<>();
+        stateListMap.put(newInitialState, reachableStates);
+        modifiedStatesMap.put(currentState, false);
+        List<Integer> newReachableStates;
+        newStateList.add(currentState);
+
+        while (modifiedStatesMap.containsValue(false)) {
+            if (!firstLoop) {
+                currentState = modifiedStatesMap.keySet().stream().filter(key -> !modifiedStatesMap.get(key)).findFirst().get();
+                reachableStates = stateListMap.get(currentState);
+            }
+            characterListMap = new HashMap<>();
+            for (Integer state : reachableStates) {
+                for (TransitionDTO oldTransition : oldTransitionList) {
+                    if (state.equals(oldTransition.getStateFrom())) {
+                        for (Integer reachableState : epsilonSet.get(oldTransition.getStateTo())) {
+                            if (!characterListMap.containsKey(oldTransition.getSymbol())) {
+                                characterListMap.put(oldTransition.getSymbol(), new ArrayList<>());
+                            }
+                            if (!characterListMap.get(oldTransition.getSymbol()).contains(reachableState)) {
+                                characterListMap.get(oldTransition.getSymbol()).add(reachableState);
+                            }
+                        }
+                    }
+                }
+            }
+            for (Character symbol : characterListMap.keySet()) {
+                newReachableStates = new ArrayList<>(characterListMap.get(symbol));
+                if (!stateListMap.containsValue(newReachableStates)) {
+                    stateListMap.put(++newStates, newReachableStates);
+                    newStateList.add(newStates);
+                    modifiedStatesMap.put(newStates, false);
+                }
+                List<Integer> finalNewReachableStates = newReachableStates;
+                Integer key = 0;
+                for (Map.Entry<Integer, List<Integer>> entry : stateListMap.entrySet()) {
+                    if (Objects.equals(entry.getValue(), finalNewReachableStates)) {
+                        key = entry.getKey();
+                        break;
+                    }
+                }
+                newTransitionList.add(new TransitionDTO(currentState, key, symbol));
+            }
+            modifiedStatesMap.put(currentState, true);
+            firstLoop = false;
+        }
+
+        determinizedAutomata.setAcceptanceStates(newAcceptanceStates);
+        for (Integer state : stateListMap.keySet()) {
+            for (Integer acceptanceState : finiteAutomata.getAcceptanceStates()) {
+                if (stateListMap.get(state).contains(acceptanceState)) {
+                    newAcceptanceStates.add(state);
+                }
+            }
+        }
+        determinizedAutomata.setStateList(newStateList);
+        determinizedAutomata.setNStates(newStateList.size());
+        determinizedAutomata.setInitialState(newInitialState);
+        determinizedAutomata.setTransitionList(newTransitionList);
+        determinizedAutomata.setAlphabet(finiteAutomata.getAlphabet());
+
+    }
+
+    private Map<Integer, List<Integer>> calculateEpsilonSet(FiniteAutomataDTO finiteAutomata) {
+        Map<Integer, List<Integer>> epsilonSet = new HashMap<>();
+
+        if(finiteAutomata.getAlphabet().contains('&')) {
+
+            for (TransitionDTO transition : finiteAutomata.getTransitionList()) {
+                if (transition.getSymbol() == '&') {
+                    if (!epsilonSet.containsKey(transition.getStateFrom())) {
+                        epsilonSet.put(transition.getStateFrom(), new ArrayList<>());
+                    }
+                    epsilonSet.get(transition.getStateFrom()).add(transition.getStateTo());
+                }
+            }
+
+            for (int i = 0; i < epsilonSet.keySet().size(); i++) {
+                for (Integer key : epsilonSet.keySet()) {
+                    for (Integer value : epsilonSet.get(key)) {
+                        if (epsilonSet.containsKey(value)) {
+                            for (Integer valueToBeAdded : epsilonSet.get(value)) {
+                                if (!epsilonSet.get(key).contains(valueToBeAdded)) {
+                                    epsilonSet.get(key).add(valueToBeAdded);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        for (Integer state : finiteAutomata.getStateList()) {
+            if (!epsilonSet.containsKey(state)) {
+                epsilonSet.put(state, new ArrayList<>());
+            }
+            epsilonSet.get(state).add(state);
+        }
+
+        finiteAutomata.getAlphabet().remove(new Character('&'));
+        finiteAutomata.setTransitionList(finiteAutomata.getTransitionList().stream().filter(transition -> transition.getSymbol() != '&').collect(Collectors.toList()));
+
+        return epsilonSet;
     }
 }
