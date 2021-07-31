@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public class RegularExpressionService {
@@ -77,5 +79,56 @@ public class RegularExpressionService {
         }
     return "";
     }
+    
+    public void generateFirstLastPos(Node node) {
+        if(node == null){
+            return;
+        }
+        
+        if(node.getLeft() != null) {
+            generateFirstLastPos(node.getLeft());
+        }
+        if(node.getRight() != null) {
+            generateFirstLastPos(node.getRight());
+        }
+        
+        if (node.getData().equals('&')){
+            node.setNullable(Boolean.TRUE);
+        } else if (node.getData().equals('|')){
+            node.setNullable(node.getLeft().getNullable() || node.getRight().getNullable());
+            /* joins two lists */
+            node.setFirstpos(Stream.concat(node.getLeft().getFirstpos().stream(), node.getRight().getFirstpos().stream()).collect(Collectors.toList()));
+            node.setLastpos(Stream.concat(node.getLeft().getLastpos().stream(), node.getRight().getLastpos().stream()).collect(Collectors.toList()));
+        } else if(node.getData().equals('.')){
+            if(node.getLeft() == null) {
+                node.setNullable(node.getRight().getNullable());
+                node.setFirstpos(node.getRight().getFirstpos());
+                node.setLastpos(node.getRight().getLastpos());
+            } else if(node.getRight() == null) {
+                node.setNullable(node.getLeft().getNullable());
+                node.setFirstpos(node.getLeft().getFirstpos());
+                node.setLastpos(node.getLeft().getLastpos());
+            } else {
+                node.setNullable(node.getLeft().getNullable() && node.getRight().getNullable());
+                if(node.getLeft().getNullable()){
+                    node.setFirstpos(Stream.concat(node.getLeft().getFirstpos().stream(), node.getRight().getFirstpos().stream()).collect(Collectors.toList()));
+                } else {
+                    node.setFirstpos(node.getLeft().getFirstpos());
+                }
+                
+                if(node.getRight().getNullable()){
+                    node.setLastpos(Stream.concat(node.getLeft().getLastpos().stream(), node.getRight().getLastpos().stream()).collect(Collectors.toList()));
+                } else {
+                    node.setLastpos(node.getLeft().getLastpos());
+                }
+            }
+        } else if(node.getData().equals("*")) {
+            node.setNullable(Boolean.TRUE);
+            node.setFirstpos(node.getRight().getFirstpos());
+            node.setLastpos(node.getRight().getLastpos());
+        }
+      
+    }
+    
     
 }
