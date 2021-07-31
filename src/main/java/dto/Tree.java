@@ -13,8 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Tree {
-    String alphabet;
+    List<Character> alphabet;
     Node root;
     HashMap<Integer, List<Integer>> followpos = new HashMap<>();
-    List<Node> treeList;
+    List<String> treeList;
 }
