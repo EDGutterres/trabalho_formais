@@ -48,12 +48,17 @@ public class FiniteAutomataDTOFaker {
         return finiteAutomata;
     }
 
-    public static void makeNonDeterministic(FiniteAutomataDTO finalFiniteAutomata) {
+    public static void makeNonDeterministicWithEpsilon(FiniteAutomataDTO finalFiniteAutomata) {
         finalFiniteAutomata.getStateList().add(10);
         finalFiniteAutomata.getStateList().add(11);
         finalFiniteAutomata.setNStates(12);
         finalFiniteAutomata.getTransitionList().add(new TransitionDTO(5, 10, '&'));
         finalFiniteAutomata.getTransitionList().add(new TransitionDTO(10, 11, '&'));
 
+    }
+
+    public static void makeNonDeterministic(FiniteAutomataDTO finalFiniteAutomata) {
+        finalFiniteAutomata.getTransitionList().add(new TransitionDTO(2, 4, 'a'));
+        finalFiniteAutomata.getTransitionList().add(new TransitionDTO(3, 8, 'b'));
     }
 }

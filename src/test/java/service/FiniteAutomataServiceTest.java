@@ -28,6 +28,17 @@ public class FiniteAutomataServiceTest {
         FiniteAutomataDTO finiteAutomata1 = FiniteAutomataDTOFaker.getDFA();
         FiniteAutomataDTO finiteAutomata2 = FiniteAutomataDTOFaker.getDFA();
         FiniteAutomataDTO finalFiniteAutomata = finiteAutomataService.union(finiteAutomata1, finiteAutomata2);
+        FiniteAutomataDTOFaker.makeNonDeterministicWithEpsilon(finalFiniteAutomata);
+        finalFiniteAutomata = finiteAutomataService.determinize(finalFiniteAutomata);
+        Assert.assertFalse(finalFiniteAutomata.isNonDeterministic());
+    }
+
+    @Test
+    public void shouldDeterminizeWithEpsilonAndNonDeterministicStates() {
+        FiniteAutomataDTO finiteAutomata1 = FiniteAutomataDTOFaker.getDFA();
+        FiniteAutomataDTO finiteAutomata2 = FiniteAutomataDTOFaker.getDFA();
+        FiniteAutomataDTO finalFiniteAutomata = finiteAutomataService.union(finiteAutomata1, finiteAutomata2);
+        FiniteAutomataDTOFaker.makeNonDeterministicWithEpsilon(finalFiniteAutomata);
         FiniteAutomataDTOFaker.makeNonDeterministic(finalFiniteAutomata);
         finalFiniteAutomata = finiteAutomataService.determinize(finalFiniteAutomata);
         Assert.assertFalse(finalFiniteAutomata.isNonDeterministic());
