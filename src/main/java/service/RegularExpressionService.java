@@ -127,8 +127,5 @@ public class RegularExpressionService {
             node.setFirstpos(node.getRight().getFirstpos());
             node.setLastpos(node.getRight().getLastpos());
         }
-      
     }
-    
-    
 }
