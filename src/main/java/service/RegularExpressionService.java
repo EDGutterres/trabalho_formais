@@ -161,19 +161,7 @@ public class RegularExpressionService {
             node.setLastpos(node.getRight().getLastpos());
         }
     }
-    
-    /*
-    def post_order(self, node):
-        """
-        :return:
-        """
-        if node:
-            self.post_order(node.left)
-            self.post_order(node.right)
-            if node.data in self.alphabet or node.data == '#':
-                self.tree_list.append(node.data)
-    */
-    
+
     public void postOrder(Tree tree, Node node) {
         if(node != null){//node?????<- Isso está certo?
             this.postOrder(tree, node.getLeft());
@@ -184,5 +172,27 @@ public class RegularExpressionService {
                 tree.setTreeList(tempTree);
             }
         }
+    }
+
+    public Node optimize(Tree tree, Node node) {
+        if(node == null) {
+            return null;
+        }
+        
+        if(node.getData() == "|") {
+            if(node.getLeft().getData() == ".") {
+                node.setLeft(node.getLeft().getRight());
+            }
+            if(node.getRight().getData() == ".") {
+                node.setRight(node.getRight().getRight());
+            }
+        } else if(node.getData() == "." && node.getLeft() == null){
+            node = node.getRight();
+        }
+
+        node.setLeft(optimize(tree, node.getLeft()));
+        node.setRight(optimize(tree, node.getRight()));
+
+        return node;
     }
 }
