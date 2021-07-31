@@ -74,7 +74,7 @@ public class Tree {
         }
 
     }
-    
+
     public List<String> split_elements(String regexp) {
 
         List<String> elements_list = new ArrayList<>();
