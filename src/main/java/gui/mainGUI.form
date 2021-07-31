@@ -56,15 +56,10 @@
                                   <Component id="lblDescricaoAL" alignment="1" min="-2" pref="248" max="-2" attributes="0"/>
                                   <Component id="jScrollPane1" min="-2" pref="248" max="-2" attributes="0"/>
                               </Group>
+                              <EmptySpace min="70" pref="70" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" attributes="0">
-                                      <EmptySpace min="-2" pref="70" max="-2" attributes="0"/>
-                                      <Component id="jScrollPane3" min="-2" pref="310" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Group type="102" alignment="1" attributes="0">
-                                      <EmptySpace min="-2" pref="70" max="-2" attributes="0"/>
-                                      <Component id="lblDescricaoPseudo" min="-2" pref="316" max="-2" attributes="0"/>
-                                  </Group>
+                                  <Component id="jScrollPane3" min="-2" pref="310" max="-2" attributes="0"/>
+                                  <Component id="lblDescricaoPseudo" alignment="1" min="-2" pref="316" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
