@@ -85,7 +85,7 @@ public class mainGUI extends javax.swing.JFrame {
 
         txtPseudo.setColumns(20);
         txtPseudo.setRows(5);
-        txtPseudo.setText("def verify_if_1(self, x)\n    if x == 1:\n        return true\n    else:\n        return false\n\n");
+        txtPseudo.setText("def verify_if_1(self, x)\n    if (x == 1)\n        return true\n    else\n        return false");
         jScrollPane3.setViewportView(txtPseudo);
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(

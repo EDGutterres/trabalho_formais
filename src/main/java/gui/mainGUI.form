@@ -193,7 +193,7 @@
           <Properties>
             <Property name="columns" type="int" value="20"/>
             <Property name="rows" type="int" value="5"/>
-            <Property name="text" type="java.lang.String" value="def verify_if_1(self, x)&#xa;    if x == 1:&#xa;        return true&#xa;    else:&#xa;        return false&#xa;&#xa;"/>
+            <Property name="text" type="java.lang.String" value="def verify_if_1(self, x)&#xa;    if (x == 1)&#xa;        return true&#xa;    else&#xa;        return false"/>
           </Properties>
         </Component>
       </SubComponents>
