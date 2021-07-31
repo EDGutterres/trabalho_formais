@@ -161,4 +161,28 @@ public class RegularExpressionService {
             node.setLastpos(node.getRight().getLastpos());
         }
     }
+    
+    /*
+    def post_order(self, node):
+        """
+        :return:
+        """
+        if node:
+            self.post_order(node.left)
+            self.post_order(node.right)
+            if node.data in self.alphabet or node.data == '#':
+                self.tree_list.append(node.data)
+    */
+    
+    public void postOrder(Tree tree, Node node) {
+        if(node != null){//node?????<- Isso está certo?
+            this.postOrder(tree, node.getLeft());
+            this.postOrder(tree, node.getRight());
+            if(tree.getAlphabet().contains(node.getData()) || node.getData() == "#" ){
+                List tempTree = tree.getTreeList();
+                tempTree.add(node.getData());
+                tree.setTreeList(tempTree);
+            }
+        }
+    }
 }
