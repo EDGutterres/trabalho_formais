@@ -4,7 +4,6 @@ import dto.FiniteAutomataDTO;
 import dto.Tree;
 import dto.Node;
 import dto.TransitionDTO;
-import dto.Tree;
 
 import java.util.HashMap;
 import java.util.List;
@@ -70,7 +69,7 @@ public class RegularExpressionService {
     
     
     public List splitElements(Tree tree, String regex) {
-        List<String> elements_list = new ArrayList<String>();
+        List<String> elements_list = new ArrayList<>();
         Integer aux = 0;
         
         for (int i = 0; i < regex.length(); i++) {
@@ -99,10 +98,10 @@ public class RegularExpressionService {
     
     public static String getInternalRegex(String regex) {
         String internal_regex = "";
-        List<String> stack = new ArrayList<String>();
-        
-        for (String c : stack) {
-            if("(".equals(c)){
+        List<Character> stack = new ArrayList<>();
+
+        for (char c : regex.toCharArray()) {
+            if(c == '('){
                 stack.add(c);
             } else if(stack.isEmpty()){
                 return internal_regex;
@@ -126,14 +125,14 @@ public class RegularExpressionService {
             generateFirstLastPos(node.getRight());
         }
         
-        if (node.getData().equals('&')){
+        if (node.getData().equals("&")){
             node.setNullable(Boolean.TRUE);
-        } else if (node.getData().equals('|')){
+        } else if (node.getData().equals("|")){
             node.setNullable(node.getLeft().getNullable() || node.getRight().getNullable());
             /* joins two lists */
             node.setFirstpos(Stream.concat(node.getLeft().getFirstpos().stream(), node.getRight().getFirstpos().stream()).collect(Collectors.toList()));
             node.setLastpos(Stream.concat(node.getLeft().getLastpos().stream(), node.getRight().getLastpos().stream()).collect(Collectors.toList()));
-        } else if(node.getData().equals('.')){
+        } else if(node.getData().equals(".")){
             if(node.getLeft() == null) {
                 node.setNullable(node.getRight().getNullable());
                 node.setFirstpos(node.getRight().getFirstpos());
