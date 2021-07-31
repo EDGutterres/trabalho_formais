@@ -136,6 +136,7 @@
           <Properties>
             <Property name="columns" type="int" value="20"/>
             <Property name="rows" type="int" value="5"/>
+            <Property name="text" type="java.lang.String" value="function_definition; er: def#&#xa;if_token; er: if#&#xa;else_token; er: else#&#xa;function_name; er: name#&#xa;class_definition; er: class#&#xa;var_type; er: int#"/>
           </Properties>
         </Component>
       </SubComponents>
@@ -192,6 +193,7 @@
           <Properties>
             <Property name="columns" type="int" value="20"/>
             <Property name="rows" type="int" value="5"/>
+            <Property name="text" type="java.lang.String" value="def verify_if_1(self, x)&#xa;    if x == 1:&#xa;        return true&#xa;    else:&#xa;        return false&#xa;&#xa;"/>
           </Properties>
         </Component>
       </SubComponents>
