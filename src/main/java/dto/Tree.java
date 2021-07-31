@@ -1,19 +1,25 @@
 package dto;
 
+
 import java.util.*;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Tree {
-    String alphabet;
+    List<Character> alphabet;
     Node root;
     HashMap<Integer, List<Integer>> followpos = new HashMap<>();
-    List<Node> treeList;
+    List<String> treeList;
 
-    public Tree(String alphabet, Node root, HashMap<Integer, List<Integer>> followpos, List<Node> treeList) {
-        this.alphabet = alphabet;
-        this.root = root;
-        this.followpos = followpos;
-        this.treeList = treeList;
-    }
+
 
     public void createTree(String regexp) {
         List<String> elements_list = split_elements(regexp);
@@ -126,26 +132,4 @@ public class Tree {
         }
         return internalRegex;
     }
-}
-
-class Node {
-
-    String data;
-    Node left;
-    Node right;
-    List<Integer> firstpos;
-    List<Integer> lastpos;
-    Boolean nullable;
-
-    public Node(String data, Node left, Node right) {
-
-        this.data = data;
-        this.left = left;
-        this.right = right;
-        this.firstpos = new ArrayList<>();
-        this.lastpos = new ArrayList<>();
-        this.nullable = null;
-    }
-
-
 }
