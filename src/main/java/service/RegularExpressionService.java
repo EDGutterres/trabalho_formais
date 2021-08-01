@@ -172,7 +172,7 @@ public class RegularExpressionService {
                 if(node.getRight().getNullable()){
                     node.setLastpos(Stream.concat(node.getLeft().getLastpos().stream(), node.getRight().getLastpos().stream()).collect(Collectors.toList()));
                 } else {
-                    node.setLastpos(node.getLeft().getLastpos());
+                    node.setLastpos(node.getRight().getLastpos());
                 }
             }
         } else if(node.getData().equals("*")) {
@@ -183,7 +183,7 @@ public class RegularExpressionService {
     }
 
     public void postOrder(Tree tree, Node node) {
-        if(node != null){//node?????<- Isso está certo?
+        if(node != null){
             this.postOrder(tree, node.getLeft());
             this.postOrder(tree, node.getRight());
             if(tree.getAlphabet().stream().map(String::valueOf).collect(Collectors.joining()).contains(node.getData()) || Objects.equals(node.getData(), "#")){

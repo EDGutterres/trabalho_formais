@@ -27,6 +27,7 @@ public class Tree {
     public FiniteAutomataDTO createTree(String regexp) {
         finiteAutomataService = new FiniteAutomataService();
         regularExpressionService = new RegularExpressionService();
+        this.treeList = new ArrayList<>();
         List<String> elements_list = split_elements(regexp);
 
         if (elements_list.contains("|")) {
@@ -42,9 +43,7 @@ public class Tree {
             treeNotDone = map.get(this.root);
        }
         setLeafValue(this.root, 1);
-        //optimize(this.root); ALAN
         regularExpressionService.optimize(this, this.root);
-        //generate_first_last_pos(this.root); TURING
         regularExpressionService.generateFirstLastPos(this.root);
         generateFollowpos(this.root);
 
@@ -54,9 +53,7 @@ public class Tree {
             this.followpos.get(i+1).addAll(set);
         }
 
-        // postOrder(this.root); Alan Boy
         regularExpressionService.postOrder(this, this.root);
-        // return create_af_from_tree(this.root); Edu Boy
         return regularExpressionService.getAutomataFromTree(this.root, this);
     }
 
@@ -72,11 +69,11 @@ public class Tree {
                 List<String> newArray = elements.subList(0, elements.size()-2);
                 return new Node(".", splitTree(newArray), new Node("*", null, new Node(elements.get(elements.size() -2), null, null)));
             } else {
-                return new Node(".", null, new Node("*", null, new Node(elements.get(elements.size()-1), null, null)));
+                return new Node(".", null, new Node("*", null, new Node(elements.get(elements.size()-2), null, null)));
             }
         }
         List<String> newArray = elements.subList(0, elements.size()-1);
-        return new Node(".", splitTree(newArray), new Node(elements.get(elements.size()-2), null, null));
+        return new Node(".", splitTree(newArray), new Node(elements.get(elements.size()-1), null, null));
     }
 
     public Map<Node, Boolean> searchIncompleteNodes(Node node, boolean treeNotDone) {
@@ -92,8 +89,16 @@ public class Tree {
         if (node.data.length() == 1) {
             mapLeft = searchIncompleteNodes(node.left, treeNotDone);
             mapRight = searchIncompleteNodes(node.right, treeNotDone);
-            node.left = mapLeft.keySet().stream().findFirst().get();
-            node.right = mapRight.keySet().stream().findFirst().get();
+            node.left = null;
+            node.right = null;
+            for (Node newNode : mapLeft.keySet()) {
+                node.left = newNode;
+                treeNotDone = mapLeft.get(newNode);
+            }
+            for (Node newNode : mapRight.keySet()) {
+                node.right = newNode;
+                treeNotDone = mapRight.get(newNode);
+            }
             map.put(node, treeNotDone);
         } else {
             List<String> elements = split_elements(node.data);
@@ -124,7 +129,7 @@ public class Tree {
                 elements_list.add(Character.toString(c));
             }
             if (c == '*') {
-                if ((elements_list.get(i -1).length() > 1) && (elements_list.get(i).length() > 1) ) {
+                if ((elements_list.get(i -1).length() > 1) && (elements_list.size() > 1) ) {
                     String elem = elements_list.get(i-1);
                     String f = String.format("(%s)*",elem);
                     elements_list.add(i-1, f);
@@ -140,7 +145,7 @@ public class Tree {
     }
 
     public static String internalRegex(String regexp) {
-        String internalRegex = null;
+        String internalRegex = "";
         List<Character> stack = new ArrayList<>();
 
         for (int i = 0; i < regexp.length(); i++) {
@@ -195,7 +200,7 @@ public class Tree {
         } else if (Objects.equals(node.data, "*")) {
             for (Integer state : node.lastpos) {
                 if (!this.followpos.containsKey(state)) {
-                    this.followpos.put(state, node.firstpos);
+                    this.followpos.put(state, new ArrayList<>(node.firstpos));
                 } else {
                     this.followpos.get(state).addAll(node.firstpos);
                 }
