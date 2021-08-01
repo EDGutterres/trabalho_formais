@@ -59,6 +59,7 @@ public class mainGUI extends javax.swing.JFrame {
 
         txtInputAL.setColumns(20);
         txtInputAL.setRows(5);
+        txtInputAL.setText("function_definition; er: def#\nif_token; er: if#\nelse_token; er: else#\nfunction_name; er: name#\nclass_definition; er: class#\nvar_type; er: int#");
         jScrollPane1.setViewportView(txtInputAL);
 
         btnAtualizarAL.setFont(new java.awt.Font("Liberation Sans", 1, 15)); // NOI18N
@@ -84,6 +85,7 @@ public class mainGUI extends javax.swing.JFrame {
 
         txtPseudo.setColumns(20);
         txtPseudo.setRows(5);
+        txtPseudo.setText("def verify_if_1(self, x)\n    if (x == 1)\n        return true\n    else\n        return false");
         jScrollPane3.setViewportView(txtPseudo);
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(

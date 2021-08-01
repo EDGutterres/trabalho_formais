@@ -170,4 +170,38 @@ public class RegularExpressionService {
             node.setLastpos(node.getRight().getLastpos());
         }
     }
+
+    public void postOrder(Tree tree, Node node) {
+        if(node != null){//node?????<- Isso está certo?
+            this.postOrder(tree, node.getLeft());
+            this.postOrder(tree, node.getRight());
+            if(tree.getAlphabet().contains(node.getData()) || node.getData() == "#" ){
+                List tempTree = tree.getTreeList();
+                tempTree.add(node.getData());
+                tree.setTreeList(tempTree);
+            }
+        }
+    }
+
+    public Node optimize(Tree tree, Node node) {
+        if(node == null) {
+            return null;
+        }
+        
+        if(node.getData() == "|") {
+            if(node.getLeft().getData() == ".") {
+                node.setLeft(node.getLeft().getRight());
+            }
+            if(node.getRight().getData() == ".") {
+                node.setRight(node.getRight().getRight());
+            }
+        } else if(node.getData() == "." && node.getLeft() == null){
+            node = node.getRight();
+        }
+
+        node.setLeft(optimize(tree, node.getLeft()));
+        node.setRight(optimize(tree, node.getRight()));
+
+        return node;
+    }
 }

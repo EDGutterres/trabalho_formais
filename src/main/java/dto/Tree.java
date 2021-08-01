@@ -21,7 +21,7 @@ public class Tree {
 
 
 
-    public void createTree(String regexp) {
+    public String createTree(String regexp) {
         List<String> elements_list = split_elements(regexp);
 
         if (elements_list.contains("|")) {
@@ -36,6 +36,20 @@ public class Tree {
             this.root = map.keySet().stream().findFirst().get();
             treeNotDone = map.get(this.root);
        }
+        setLeafValue(this.root, 1);
+        //optimize(this.root); ALAN
+        //generate_first_last_pos(this.root); TURING
+        generateFollowpos(this.root);
+
+        for (int i = 0; i < this.followpos.size(); i++) {
+            Set<Integer> set = new HashSet<Integer>(this.followpos.get(i+1));
+            this.followpos.get(i+1).clear();
+            this.followpos.get(i+1).addAll(set);
+        }
+
+        // postOrder(this.root); Alan Boy
+        // return create_af_from_tree(this.root); Edu Boy
+        return "substituir pelo de cima";
     }
 
     public Node splitTree(List<String> elements) {
@@ -70,12 +84,14 @@ public class Tree {
         if (node.data.length() == 1) {
             mapLeft = searchIncompleteNodes(node.left, treeNotDone);
             mapRight = searchIncompleteNodes(node.right, treeNotDone);
+            node.left = mapLeft.keySet().stream().findFirst().get();
+            node.right = mapRight.keySet().stream().findFirst().get();
             map.put(node, treeNotDone);
             return map;
         } else {
             List<String> elements = split_elements(node.data);
             node = splitTree(elements);
-            map.put(node, treeNotDone);
+            map.put(node, true);
             return map;
         }
 
@@ -131,5 +147,48 @@ public class Tree {
             internalRegex += Character.toString(regexp.charAt(i));
         }
         return internalRegex;
+    }
+
+    public Integer setLeafValue(Node node, int pos) {
+        if (node == null) {
+            return pos;
+        }
+
+        if (node.left == null && node.right == null) {
+            node.firstpos.add(pos);
+            node.lastpos.add(pos);
+            node.nullable = false;
+            return pos + 1;
+        }
+
+        pos = setLeafValue(node.left, pos);
+        return  setLeafValue(node.right, pos);
+    }
+
+    public void generateFollowpos(Node node) {
+        if (node == null) {
+            return;
+        }
+
+        generateFollowpos(node.left);
+        generateFollowpos(node.right);
+
+        if (node.data == ".") {
+            if (node.left != null) {
+//              for i in node.left.lastpos:
+//                if i not in self.followpos_table:
+//                self.followpos_table[i] = node.right.firstpos
+//                    else:
+//                self.followpos_table[i] += node.right.firstpos
+
+            }
+        } else if (node.data == "*") {
+//            for i in node.lastpos:
+//                if i not in self.followpos_table:
+//                self.followpos_table[i] = node.firstpos
+//                    else:
+//                self.followpos_table[i] += node.firstpos
+        }
+
     }
 }
