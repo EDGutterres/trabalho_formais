@@ -22,7 +22,9 @@ public class RegularExpressionService {
         Map<Integer, Boolean> modifiedStatesMap = new HashMap<>();
         Integer initialState = 0;
         Integer currentState = 0;
+        Integer newState = currentState;
         List<Integer> stateList = new ArrayList<>();
+        List<Integer> newStateList = new ArrayList<>();
         List<TransitionDTO> transitionList = new ArrayList<>();
         List<Integer> acceptanceStates = new ArrayList<>();
         Map<Character, List<Integer>> characterListMap;
@@ -52,7 +54,14 @@ public class RegularExpressionService {
                 if (sameTransition.isEmpty()) {
                     continue;
                 }
-
+                newStateList = new ArrayList<>();
+                for (Integer state : sameTransition) {
+                    for (Integer newStateTransition : tree.getFollowpos().get(state)) {
+                        if (!newStateList.contains(newStateTransition)) {
+                            newStateList.add(newStateTransition);
+                        }
+                    }
+                }
             }
 
         }
