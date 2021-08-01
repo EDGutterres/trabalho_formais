@@ -19,8 +19,6 @@ public class Tree {
     HashMap<Integer, List<Integer>> followpos = new HashMap<>();
     List<String> treeList;
 
-
-
     public String createTree(String regexp) {
         List<String> elements_list = split_elements(regexp);
 
@@ -42,7 +40,7 @@ public class Tree {
         generateFollowpos(this.root);
 
         for (int i = 0; i < this.followpos.size(); i++) {
-            Set<Integer> set = new HashSet<Integer>(this.followpos.get(i+1));
+            Set<Integer> set = new HashSet<>(this.followpos.get(i+1));
             this.followpos.get(i+1).clear();
             this.followpos.get(i+1).addAll(set);
         }
@@ -59,7 +57,7 @@ public class Tree {
         if (elements.contains("|")) {
             return new Node("|", new Node(elements.get(0), null, null), new Node(elements.get(2), null, null));
         }
-        if (elements.get(elements.size() -1) == "*") {
+        if (Objects.equals(elements.get(elements.size() - 1), "*")) {
             if (elements.size() > 2) {
                 List<String> newArray = elements.subList(0, elements.size()-2);
                 return new Node(".", splitTree(newArray), new Node("*", null, new Node(elements.get(elements.size() -2), null, null)));
@@ -87,13 +85,12 @@ public class Tree {
             node.left = mapLeft.keySet().stream().findFirst().get();
             node.right = mapRight.keySet().stream().findFirst().get();
             map.put(node, treeNotDone);
-            return map;
         } else {
             List<String> elements = split_elements(node.data);
             node = splitTree(elements);
             map.put(node, true);
-            return map;
         }
+        return map;
 
     }
 
@@ -108,12 +105,15 @@ public class Tree {
             }
             int pos = i + temp;
             char c = regexp.charAt(pos);
-            String[] values = {"|","#","&"};
+            List<Character> values = new ArrayList<>();
+            values.add('|');
+            values.add('#');
+            values.add('&');
 
-            if (this.alphabet.contains(Character.toString(c)) || Arrays.asList(values).contains(Character.toString(c))){
+            if (this.alphabet.contains(c) || values.contains(c)){
                 elements_list.add(Character.toString(c));
             }
-            if (Character.toString(c) == "*") {
+            if (c == '*') {
                 if ((elements_list.get(i -1).length() > 1) && (elements_list.get(i).length() > 1) ) {
                     String elem = elements_list.get(i-1);
                     String f = String.format("(%s)*",elem);
@@ -121,7 +121,7 @@ public class Tree {
                 } else {
                     elements_list.add("*");
                 }
-            } else if (Character.toString(c) == "("){
+            } else if (c == '('){
                 elements_list.add(internalRegex(regexp.substring(i + temp + 1, regexp.length()-1)));
                 temp += elements_list.get(elements_list.size() - 1).length() + 1;
             }
@@ -131,17 +131,16 @@ public class Tree {
 
     public static String internalRegex(String regexp) {
         String internalRegex = null;
-        List<String> stack = new ArrayList<>();
+        List<Character> stack = new ArrayList<>();
 
         for (int i = 0; i < regexp.length(); i++) {
-            if (Character.toString(regexp.charAt(i))  == "(") {
-                stack.add(Character.toString(regexp.charAt(i)));
-            } else if (Character.toString(regexp.charAt(i))  == ")") {
+            if (regexp.charAt(i) == '(') {
+                stack.add(regexp.charAt(i));
+            } else if (regexp.charAt(i)  == ')') {
                 if (stack.isEmpty()) {
                     return internalRegex;
                 } else {
-                    int index = stack.size() - 1;
-                    stack.remove(index);
+                    stack.remove(stack.size() - 1);
                 }
             }
             internalRegex += Character.toString(regexp.charAt(i));
@@ -173,8 +172,11 @@ public class Tree {
         generateFollowpos(node.left);
         generateFollowpos(node.right);
 
-        if (node.data == ".") {
+        if (Objects.equals(node.data, ".")) {
             if (node.left != null) {
+                for (Integer state : node.left.lastpos) {
+                    
+                }
 //              for i in node.left.lastpos:
 //                if i not in self.followpos_table:
 //                self.followpos_table[i] = node.right.firstpos
@@ -182,7 +184,7 @@ public class Tree {
 //                self.followpos_table[i] += node.right.firstpos
 
             }
-        } else if (node.data == "*") {
+        } else if (Objects.equals(node.data, "*")) {
 //            for i in node.lastpos:
 //                if i not in self.followpos_table:
 //                self.followpos_table[i] = node.firstpos

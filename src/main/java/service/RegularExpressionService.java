@@ -5,10 +5,7 @@ import dto.Tree;
 import dto.Node;
 import dto.TransitionDTO;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -22,17 +19,17 @@ public class RegularExpressionService {
         Map<Integer, Boolean> modifiedStatesMap = new HashMap<>();
         Integer initialState = 0;
         Integer currentState = 0;
-        Integer newState = currentState;
+        Integer newState = 0;
         List<Integer> stateList = new ArrayList<>();
-        List<Integer> newStateList = new ArrayList<>();
+        List<Integer> newStateList;
         List<TransitionDTO> transitionList = new ArrayList<>();
         List<Integer> acceptanceStates = new ArrayList<>();
-        Map<Character, List<Integer>> characterListMap;
         List<Integer> sameTransition;
         stateListMap.put(0, node.getFirstpos());
         modifiedStatesMap.put(currentState, false);
 
         while (modifiedStatesMap.containsValue(false)) {
+            currentState = modifiedStatesMap.keySet().stream().filter(key -> !modifiedStatesMap.get(key)).findFirst().get();
             modifiedStatesMap.put(currentState, true);
             stateList.add(currentState);
             for (Integer state : stateListMap.get(currentState)) {
@@ -40,7 +37,6 @@ public class RegularExpressionService {
                     acceptanceStates.add(currentState);
                 }
             }
-            characterListMap = new HashMap<>();
             for (Character character : alphabet) {
                 if (character == '&') {
                     continue;
@@ -62,9 +58,23 @@ public class RegularExpressionService {
                         }
                     }
                 }
+                Collections.sort(newStateList);
+                if (!stateListMap.containsValue(newStateList)) {
+                    modifiedStatesMap.put(++newState, false);
+                    stateListMap.put(newState, newStateList);
+                } else {
+                    for (Integer key : stateListMap.keySet()) {
+                        if (newStateList.equals(stateListMap.get(key))) {
+                            newState = key;
+                            break;
+                        }
+                    }
+                }
+                transitionList.add(new TransitionDTO(currentState, newState, character));
             }
 
         }
+
 
         alphabet.remove('&');
         finiteAutomata.setStateList(stateList);
@@ -73,6 +83,7 @@ public class RegularExpressionService {
         finiteAutomata.setTransitionList(transitionList);
         finiteAutomata.setAcceptanceStates(acceptanceStates);
         finiteAutomata.setAlphabet(alphabet);
+        finiteAutomata.setNonDeterministic(false);
         return finiteAutomata;
     }
     
@@ -88,7 +99,7 @@ public class RegularExpressionService {
 
             String c = String.valueOf(regex.charAt(i + aux));
 
-            if(tree.getAlphabet().contains(c) || "#|&".contains(c)) {
+            if(tree.getAlphabet().stream().map(String::valueOf).collect(Collectors.joining()).contains(c) || "#|&".contains(c)) {
                 elements_list.add(c);
             }
             if("*".equals(c)) {
@@ -175,8 +186,8 @@ public class RegularExpressionService {
         if(node != null){//node?????<- Isso está certo?
             this.postOrder(tree, node.getLeft());
             this.postOrder(tree, node.getRight());
-            if(tree.getAlphabet().contains(node.getData()) || node.getData() == "#" ){
-                List tempTree = tree.getTreeList();
+            if(tree.getAlphabet().stream().map(String::valueOf).collect(Collectors.joining()).contains(node.getData()) || Objects.equals(node.getData(), "#")){
+                List<String> tempTree = tree.getTreeList();
                 tempTree.add(node.getData());
                 tree.setTreeList(tempTree);
             }
@@ -188,14 +199,14 @@ public class RegularExpressionService {
             return null;
         }
         
-        if(node.getData() == "|") {
-            if(node.getLeft().getData() == ".") {
+        if(Objects.equals(node.getData(), "|")) {
+            if(Objects.equals(node.getLeft().getData(), ".")) {
                 node.setLeft(node.getLeft().getRight());
             }
-            if(node.getRight().getData() == ".") {
+            if(Objects.equals(node.getRight().getData(), ".")) {
                 node.setRight(node.getRight().getRight());
             }
-        } else if(node.getData() == "." && node.getLeft() == null){
+        } else if(Objects.equals(node.getData(), ".") && node.getLeft() == null){
             node = node.getRight();
         }
 
