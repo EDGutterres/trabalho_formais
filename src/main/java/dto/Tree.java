@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import service.FiniteAutomataService;
+import service.RegularExpressionService;
 
 
 @Getter
@@ -19,7 +21,12 @@ public class Tree {
     HashMap<Integer, List<Integer>> followpos = new HashMap<>();
     List<String> treeList;
 
-    public String createTree(String regexp) {
+    FiniteAutomataService finiteAutomataService;
+    RegularExpressionService regularExpressionService;
+
+    public FiniteAutomataDTO createTree(String regexp) {
+        finiteAutomataService = new FiniteAutomataService();
+        regularExpressionService = new RegularExpressionService();
         List<String> elements_list = split_elements(regexp);
 
         if (elements_list.contains("|")) {
@@ -36,7 +43,9 @@ public class Tree {
        }
         setLeafValue(this.root, 1);
         //optimize(this.root); ALAN
+        regularExpressionService.optimize(this, this.root);
         //generate_first_last_pos(this.root); TURING
+        regularExpressionService.generateFirstLastPos(this.root);
         generateFollowpos(this.root);
 
         for (int i = 0; i < this.followpos.size(); i++) {
@@ -46,8 +55,9 @@ public class Tree {
         }
 
         // postOrder(this.root); Alan Boy
+        regularExpressionService.postOrder(this, this.root);
         // return create_af_from_tree(this.root); Edu Boy
-        return "substituir pelo de cima";
+        return regularExpressionService.getAutomataFromTree(this.root, this);
     }
 
     public Node splitTree(List<String> elements) {
@@ -175,22 +185,21 @@ public class Tree {
         if (Objects.equals(node.data, ".")) {
             if (node.left != null) {
                 for (Integer state : node.left.lastpos) {
-                    
+                    if (!this.followpos.containsKey(state)) {
+                        this.followpos.put(state, node.right.firstpos);
+                    } else {
+                        this.followpos.get(state).addAll(node.right.firstpos);
+                    }
                 }
-//              for i in node.left.lastpos:
-//                if i not in self.followpos_table:
-//                self.followpos_table[i] = node.right.firstpos
-//                    else:
-//                self.followpos_table[i] += node.right.firstpos
-
             }
         } else if (Objects.equals(node.data, "*")) {
-//            for i in node.lastpos:
-//                if i not in self.followpos_table:
-//                self.followpos_table[i] = node.firstpos
-//                    else:
-//                self.followpos_table[i] += node.firstpos
+            for (Integer state : node.lastpos) {
+                if (!this.followpos.containsKey(state)) {
+                    this.followpos.put(state, node.firstpos);
+                } else {
+                    this.followpos.get(state).addAll(node.firstpos);
+                }
+            }
         }
-
     }
 }
