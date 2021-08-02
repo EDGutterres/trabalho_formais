@@ -20,5 +20,6 @@ public class FiniteAutomataDTO {
     private List<Character> alphabet;
     private List<TransitionDTO> transitionList;
     private boolean isNonDeterministic;
+    private Integer lastState;
 
 }

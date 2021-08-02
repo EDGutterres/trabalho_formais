@@ -56,6 +56,7 @@ public class mainGUI extends javax.swing.JFrame {
         jScrollPane4 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         btnAnalisarPseudo = new javax.swing.JButton();
+        model = new javax.swing.table.DefaultTableModel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setPreferredSize(new java.awt.Dimension(1024, 600));
@@ -72,7 +73,7 @@ public class mainGUI extends javax.swing.JFrame {
 
         txtInputAL.setColumns(20);
         txtInputAL.setRows(5);
-        txtInputAL.setText("function_definition: def");
+        txtInputAL.setText("function_token: func\nif_token: if\nelse_token: else\ntrue_token: true\nfalse_token: false");
         jScrollPane1.setViewportView(txtInputAL);
 
         btnAtualizarAL.setFont(new java.awt.Font("Liberation Sans", 1, 15)); // NOI18N
@@ -98,25 +99,13 @@ public class mainGUI extends javax.swing.JFrame {
 
         txtPseudo.setColumns(20);
         txtPseudo.setRows(5);
-        txtPseudo.setText("def verify_if_1(self, x)\n    if (x == 1)\n        return true\n    else\n        return false");
+        txtPseudo.setText("if func myVariable false");
         jScrollPane3.setViewportView(txtPseudo);
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null}
-            },
-            new String [] {
-                "Token", "Lexema"
-            }
-        ) {
-            boolean[] canEdit = new boolean [] {
-                false, false
-            };
+        jTable1.setModel(model);
+        model.addColumn("Token");
+        model.addColumn("Lexeme");
 
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
         jScrollPane4.setViewportView(jTable1);
 
         btnAnalisarPseudo.setFont(new java.awt.Font("Liberation Sans", 1, 15)); // NOI18N
@@ -192,7 +181,6 @@ public class mainGUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAtualizarALActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAtualizarALActionPerformed
-        System.out.println("Atualizando AL");
         FiniteAutomataDTO newAutomata;
         boolean modified = false;
         for (String line : txtInputAL.getText().split("\\n")) {
@@ -216,7 +204,14 @@ public class mainGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_btnAtualizarALActionPerformed
 
     private void btnAnalisarPseudoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAnalisarPseudoActionPerformed
-        System.out.println("Analisar Pseudocódigo");
+        String[] words = txtPseudo.getText().split(" ");
+        for (String word : words) {
+            if (finiteAutomataService.recongnize(finalAutomata, word)) {
+
+            } else {
+                model.addRow(new Object[] {word, "Does not exist"});
+            }
+        }
     }//GEN-LAST:event_btnAnalisarPseudoActionPerformed
 
     /**
@@ -277,5 +272,6 @@ public class mainGUI extends javax.swing.JFrame {
     private javax.swing.JLabel lblTitulo;
     private javax.swing.JTextArea txtInputAL;
     private javax.swing.JTextArea txtPseudo;
+    private javax.swing.table.DefaultTableModel model;
     // End of variables declaration//GEN-END:variables
 }

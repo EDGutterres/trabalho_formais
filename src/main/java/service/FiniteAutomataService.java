@@ -221,4 +221,24 @@ public class FiniteAutomataService {
 
         return copyFiniteAutomata;
     }
+
+    public boolean recongnize(FiniteAutomataDTO finiteAutomata, String word) {
+
+        int currentState = finiteAutomata.getInitialState();
+        int finalState;
+
+        List<TransitionDTO> transitionList = finiteAutomata.getTransitionList();
+
+        for (char c : word.toCharArray()) {
+            for (TransitionDTO transition : transitionList) {
+                if (transition.getStateFrom() == currentState && transition.getSymbol().equals(c)) {
+                    currentState = transition.getStateTo();
+                    break;
+                }
+            }
+        }
+        finalState = currentState;
+        finiteAutomata.setLastState(finalState);
+        return finiteAutomata.getAcceptanceStates().contains(finalState);
+    }
 }
