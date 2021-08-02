@@ -28,9 +28,9 @@ public class RegularExpressionServiceTest {
         List<Character> characterList = new ArrayList<>();
         characterList.add('a');
         characterList.add('b');
-        //characterList.add('s');
+        //characterList.add('&');
         tree.setAlphabet(characterList);
-        FiniteAutomataDTO finiteAutomata = tree.createTree("(a|b)*abb#");
+        FiniteAutomataDTO finiteAutomata = tree.createTree("aa*(bb*aa*b)*#");
         Assert.assertFalse(finiteAutomata.isNonDeterministic());
     }
 

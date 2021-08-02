@@ -79,7 +79,7 @@ public class RegularExpressionService {
 
 
         if (alphabet.contains('&'))
-            alphabet.remove('&');
+            alphabet.remove(new Character('&'));
         finiteAutomata.setStateList(stateList);
         finiteAutomata.setNStates(stateList.size());
         finiteAutomata.setInitialState(initialState);
