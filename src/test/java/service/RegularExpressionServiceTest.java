@@ -31,7 +31,7 @@ public class RegularExpressionServiceTest {
         //characterList.add('s');
         tree.setAlphabet(characterList);
         FiniteAutomataDTO finiteAutomata = tree.createTree("(a|b)*abb#");
-        Assert.assertTrue(finiteAutomata.isNonDeterministic());
+        Assert.assertFalse(finiteAutomata.isNonDeterministic());
     }
 
 

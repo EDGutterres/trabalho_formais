@@ -20,6 +20,7 @@ public class RegularExpressionService {
         Integer initialState = 0;
         Integer currentState = 0;
         Integer newState = 0;
+        Integer newTransitionState = 0;
         List<Integer> stateList = new ArrayList<>();
         List<Integer> newStateList;
         List<TransitionDTO> transitionList = new ArrayList<>();
@@ -33,7 +34,7 @@ public class RegularExpressionService {
             modifiedStatesMap.put(currentState, true);
             stateList.add(currentState);
             for (Integer state : stateListMap.get(currentState)) {
-                if (tree.getTreeList().get(state).equals("#")) {
+                if (tree.getTreeList().indexOf("#") + 1 == state) {
                     acceptanceStates.add(currentState);
                 }
             }
@@ -43,7 +44,7 @@ public class RegularExpressionService {
                 }
                 sameTransition = new ArrayList<>();
                 for (Integer state : stateListMap.get(currentState)) {
-                    if (tree.getTreeList().get(state).equals(character.toString())) {
+                    if (tree.getTreeList().get(state-1).equals(character.toString())) {
                         sameTransition.add(state);
                     }
                 }
@@ -62,21 +63,23 @@ public class RegularExpressionService {
                 if (!stateListMap.containsValue(newStateList)) {
                     modifiedStatesMap.put(++newState, false);
                     stateListMap.put(newState, newStateList);
+                    newTransitionState = newState;
                 } else {
                     for (Integer key : stateListMap.keySet()) {
                         if (newStateList.equals(stateListMap.get(key))) {
-                            newState = key;
+                            newTransitionState = key;
                             break;
                         }
                     }
                 }
-                transitionList.add(new TransitionDTO(currentState, newState, character));
+                transitionList.add(new TransitionDTO(currentState, newTransitionState, character));
             }
 
         }
 
 
-        alphabet.remove('&');
+        if (alphabet.contains('&'))
+            alphabet.remove('&');
         finiteAutomata.setStateList(stateList);
         finiteAutomata.setNStates(stateList.size());
         finiteAutomata.setInitialState(initialState);
@@ -85,35 +88,6 @@ public class RegularExpressionService {
         finiteAutomata.setAlphabet(alphabet);
         finiteAutomata.setNonDeterministic(false);
         return finiteAutomata;
-    }
-    
-    
-    public List splitElements(Tree tree, String regex) {
-        List<String> elements_list = new ArrayList<>();
-        Integer aux = 0;
-        
-        for (int i = 0; i < regex.length(); i++) {
-            if((i + aux) == regex.length()){
-                break;
-            }
-
-            String c = String.valueOf(regex.charAt(i + aux));
-
-            if(tree.getAlphabet().stream().map(String::valueOf).collect(Collectors.joining()).contains(c) || "#|&".contains(c)) {
-                elements_list.add(c);
-            }
-            if("*".equals(c)) {
-                if(elements_list.get(i - 1).length()> 1 && elements_list.size() > 1) {
-                    elements_list.set(i-1, "(" + elements_list.get(i - 1) + ")*");
-                } else {
-                    elements_list.add("*");
-                }
-            } else if("(".equals(c)){
-                elements_list.add(getInternalRegex(regex.substring(i+aux+1, regex.length()-1)));
-                aux += elements_list.get(elements_list.size()-1).length() + 1;
-            }
-        }
-        return elements_list;
     }
     
     public static String getInternalRegex(String regex) {
