@@ -8,8 +8,13 @@ import java.util.stream.Collectors;
 
 public class FiniteAutomataService {
 
-    public FiniteAutomataDTO union(FiniteAutomataDTO finiteAutomata1, FiniteAutomataDTO finiteAutomata2) {
+    public FiniteAutomataDTO union(FiniteAutomataDTO finiteAutomataFirst, FiniteAutomataDTO finiteAutomataSecond) {
+        if (finiteAutomataSecond.getStateList() == null) {
+            return finiteAutomataFirst;
+        }
         FiniteAutomataDTO finalFiniteAutomata = new FiniteAutomataDTO();
+        FiniteAutomataDTO finiteAutomata1 = copyAutomata(finiteAutomataFirst);
+        FiniteAutomataDTO finiteAutomata2 = copyAutomata(finiteAutomataSecond);
         refactorAutomata(finiteAutomata1, 1);
         refactorAutomata(finiteAutomata2, finiteAutomata1.getNStates()+1);
 
@@ -56,11 +61,12 @@ public class FiniteAutomataService {
         });
     }
 
-    public FiniteAutomataDTO determinize(FiniteAutomataDTO finiteAutomata) {
-        if (!finiteAutomata.isNonDeterministic()) {
-            return finiteAutomata;
+    public FiniteAutomataDTO determinize(FiniteAutomataDTO finiteAutomataEntry) {
+        if (!finiteAutomataEntry.isNonDeterministic()) {
+            return finiteAutomataEntry;
         }
         FiniteAutomataDTO determinizedAutomata = new FiniteAutomataDTO();
+        FiniteAutomataDTO finiteAutomata = copyAutomata(finiteAutomataEntry);
 
         Map<Integer, List<Integer>> epsilonSet = calculateEpsilonSet(finiteAutomata);
         defineTransitions(finiteAutomata, determinizedAutomata, epsilonSet);
@@ -186,5 +192,33 @@ public class FiniteAutomataService {
         finiteAutomata.setTransitionList(finiteAutomata.getTransitionList().stream().filter(transition -> transition.getSymbol() != '&').collect(Collectors.toList()));
 
         return epsilonSet;
+    }
+
+    public FiniteAutomataDTO copyAutomata(FiniteAutomataDTO finiteAutomata) {
+        FiniteAutomataDTO copyFiniteAutomata = new FiniteAutomataDTO();
+        int nStates = finiteAutomata.getNStates();
+        List<Integer> stateList = new ArrayList<>(finiteAutomata.getStateList());
+        Integer initialState = finiteAutomata.getInitialState();
+        List<Integer> acceptanceStates = new ArrayList<>(finiteAutomata.getAcceptanceStates());
+        List<Character> alphabet = new ArrayList<>(finiteAutomata.getAlphabet());
+        List<TransitionDTO> transitionList = new ArrayList<>();
+        for (TransitionDTO transition : finiteAutomata.getTransitionList()) {
+            TransitionDTO newTransition = new TransitionDTO();
+            newTransition.setStateFrom(transition.getStateFrom());
+            newTransition.setStateTo(transition.getStateTo());
+            newTransition.setSymbol(transition.getSymbol());
+            transitionList.add(newTransition);
+        }
+        boolean isNonDeterministic = finiteAutomata.isNonDeterministic();
+
+        copyFiniteAutomata.setNStates(nStates);
+        copyFiniteAutomata.setStateList(stateList);
+        copyFiniteAutomata.setInitialState(initialState);
+        copyFiniteAutomata.setAcceptanceStates(acceptanceStates);
+        copyFiniteAutomata.setAlphabet(alphabet);
+        copyFiniteAutomata.setTransitionList(transitionList);
+        copyFiniteAutomata.setNonDeterministic(isNonDeterministic);
+
+        return copyFiniteAutomata;
     }
 }

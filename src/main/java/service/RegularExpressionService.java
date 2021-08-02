@@ -189,4 +189,16 @@ public class RegularExpressionService {
 
         return node;
     }
+
+    public FiniteAutomataDTO getDFA(String token) {
+        Tree tree = new Tree();
+        List<Character> characterList = new ArrayList<>();
+        for (char c : token.toCharArray()) {
+            if (!characterList.contains(c)) {
+                characterList.add(c);
+            }
+        }
+        tree.setAlphabet(characterList);
+        return tree.createTree(token + "#");
+    }
 }

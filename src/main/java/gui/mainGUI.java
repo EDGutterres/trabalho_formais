@@ -5,6 +5,15 @@
  */
 package gui;
 
+import dto.FiniteAutomataDTO;
+import service.FiniteAutomataService;
+import service.RegularExpressionService;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  *
  * @author allu
@@ -15,6 +24,10 @@ public class mainGUI extends javax.swing.JFrame {
      * Creates new form JFrame
      */
     public mainGUI() {
+        finiteAutomataList = new ArrayList<>();
+        symbolTable = new HashMap<>();
+        regularExpressionService = new RegularExpressionService();
+        finiteAutomataService = new FiniteAutomataService();
         initComponents();
         this.setLocationRelativeTo(null);
     }
@@ -59,7 +72,7 @@ public class mainGUI extends javax.swing.JFrame {
 
         txtInputAL.setColumns(20);
         txtInputAL.setRows(5);
-        txtInputAL.setText("function_definition; er: def#\nif_token; er: if#\nelse_token; er: else#\nfunction_name; er: name#\nclass_definition; er: class#\nvar_type; er: int#");
+        txtInputAL.setText("function_definition: def");
         jScrollPane1.setViewportView(txtInputAL);
 
         btnAtualizarAL.setFont(new java.awt.Font("Liberation Sans", 1, 15)); // NOI18N
@@ -180,6 +193,26 @@ public class mainGUI extends javax.swing.JFrame {
 
     private void btnAtualizarALActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAtualizarALActionPerformed
         System.out.println("Atualizando AL");
+        FiniteAutomataDTO newAutomata;
+        boolean modified = false;
+        for (String line : txtInputAL.getText().split("\\n")) {
+            String[] splitAux = line.split(":");
+            String lexeme = splitAux[0].trim();
+            String token = splitAux[1].trim();
+            if (!symbolTable.containsKey(lexeme) && !symbolTable.containsValue(token)) {
+                symbolTable.put(lexeme, token);
+                newAutomata = regularExpressionService.getDFA(token);
+                finiteAutomataList.add(newAutomata);
+                modified = true;
+            }
+        }
+        if (modified) {
+            finalAutomata = new FiniteAutomataDTO();
+            for (FiniteAutomataDTO finiteAutomata : finiteAutomataList) {
+                finalAutomata = finiteAutomataService.union(finiteAutomata, finalAutomata);
+            }
+            finalAutomata = finiteAutomataService.determinize(finalAutomata);
+        }
     }//GEN-LAST:event_btnAtualizarALActionPerformed
 
     private void btnAnalisarPseudoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAnalisarPseudoActionPerformed
@@ -221,6 +254,12 @@ public class mainGUI extends javax.swing.JFrame {
             }
         });
     }
+
+    private List<FiniteAutomataDTO> finiteAutomataList;
+    private FiniteAutomataDTO finalAutomata;
+    private Map<String, String> symbolTable;
+    private RegularExpressionService regularExpressionService;
+    private FiniteAutomataService finiteAutomataService;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAnalisarPseudo;
