@@ -9,10 +9,7 @@ import dto.FiniteAutomataDTO;
 import service.FiniteAutomataService;
 import service.RegularExpressionService;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -28,6 +25,7 @@ public class mainGUI extends javax.swing.JFrame {
         symbolTable = new HashMap<>();
         regularExpressionService = new RegularExpressionService();
         finiteAutomataService = new FiniteAutomataService();
+        finiteAutomataMap = new HashMap<>();
         initComponents();
         this.setLocationRelativeTo(null);
     }
@@ -187,16 +185,33 @@ public class mainGUI extends javax.swing.JFrame {
             String[] splitAux = line.split(":");
             String lexeme = splitAux[0].trim();
             String token = splitAux[1].trim();
-            if (!symbolTable.containsKey(lexeme) && !symbolTable.containsValue(token)) {
+            if (!symbolTable.containsValue(token)) {
+                if (symbolTable.containsKey(lexeme)) {
+                    finiteAutomataMap.remove(lexeme);
+                    symbolTable.remove(lexeme);
+                }
                 symbolTable.put(lexeme, token);
                 newAutomata = regularExpressionService.getDFA(token);
-                finiteAutomataList.add(newAutomata);
+                finiteAutomataMap.put(lexeme, newAutomata);
                 modified = true;
+            } else {
+                for (String oldLexeme : symbolTable.keySet()) {
+                    if (symbolTable.get(oldLexeme).equals(token) && !Objects.equals(oldLexeme, lexeme)) {
+                        finiteAutomataMap.remove(oldLexeme);
+                        symbolTable.remove(oldLexeme);
+                        symbolTable.put(lexeme, token);
+                        newAutomata = regularExpressionService.getDFA(token);
+                        finiteAutomataMap.put(lexeme, newAutomata);
+                        modified = true;
+                        break;
+                    }
+                }
+
             }
         }
         if (modified) {
             finalAutomata = new FiniteAutomataDTO();
-            for (FiniteAutomataDTO finiteAutomata : finiteAutomataList) {
+            for (FiniteAutomataDTO finiteAutomata : finiteAutomataMap.values()) {
                 finalAutomata = finiteAutomataService.union(finiteAutomata, finalAutomata);
             }
             finalAutomata = finiteAutomataService.determinize(finalAutomata);
@@ -213,14 +228,31 @@ public class mainGUI extends javax.swing.JFrame {
         }
         int finalState;
         for (String word : words) {
+            boolean hasToken = false;
             if ((finalState = finiteAutomataService.recongnize(finalAutomata, word)) != -1) {
                 for (String lexeme : finalStateMap.keySet()) {
                     if (finalState == finalStateMap.get(lexeme)) {
-                        model.addRow(new Object[] {symbolTable.get(lexeme), lexeme});
+                        for (int i = 0; i < model.getRowCount(); ++i){
+                            if (model.getValueAt(i,0).equals(symbolTable.get(lexeme))) {
+                                hasToken = true;
+                                break;
+                            }
+                        }
+                        if (!hasToken) {
+                            model.addRow(new Object[] {symbolTable.get(lexeme), lexeme});
+                        }
                     }
                 }
             } else {
-                model.addRow(new Object[] {word, "Does not exist"});
+                for (int i = 0; i < model.getRowCount(); ++i){
+                    if (model.getValueAt(i,0).equals(word)) {
+                        hasToken = true;
+                        break;
+                    }
+                }
+                if (!hasToken) {
+                    model.addRow(new Object[] {word, "Does not exist"});
+                }
             }
         }
     }//GEN-LAST:event_btnAnalisarPseudoActionPerformed
@@ -262,6 +294,7 @@ public class mainGUI extends javax.swing.JFrame {
     }
 
     private List<FiniteAutomataDTO> finiteAutomataList;
+    private Map<String, FiniteAutomataDTO> finiteAutomataMap;
     private FiniteAutomataDTO finalAutomata;
     private Map<String, String> symbolTable;
     private Map<String, Integer> finalStateMap;
