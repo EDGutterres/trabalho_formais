@@ -222,7 +222,7 @@ public class FiniteAutomataService {
         return copyFiniteAutomata;
     }
 
-    public boolean recongnize(FiniteAutomataDTO finiteAutomata, String word) {
+    public int recongnize(FiniteAutomataDTO finiteAutomata, String word) {
 
         int currentState = finiteAutomata.getInitialState();
         int finalState;
@@ -239,6 +239,23 @@ public class FiniteAutomataService {
         }
         finalState = currentState;
         finiteAutomata.setLastState(finalState);
-        return finiteAutomata.getAcceptanceStates().contains(finalState);
+        if (finiteAutomata.getAcceptanceStates().contains(finalState)) {
+            return finalState;
+        }
+        return -1;
+    }
+
+    public Map<String, Integer> generateFinalStateMap(FiniteAutomataDTO finalAutomata, Map<String, String> symbolTable) {
+        Map<String, Integer> finalStateMap = new HashMap<>();
+        int finalState;
+        String token;
+
+        for (String lexeme : symbolTable.keySet()) {
+            token = symbolTable.get(lexeme);
+            finalState = recongnize(finalAutomata, token);
+            finalStateMap.put(lexeme, finalState);
+        }
+
+        return finalStateMap;
     }
 }

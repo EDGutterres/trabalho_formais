@@ -200,14 +200,20 @@ public class mainGUI extends javax.swing.JFrame {
                 finalAutomata = finiteAutomataService.union(finiteAutomata, finalAutomata);
             }
             finalAutomata = finiteAutomataService.determinize(finalAutomata);
+            finalStateMap = finiteAutomataService.generateFinalStateMap(finalAutomata, symbolTable);
         }
     }//GEN-LAST:event_btnAtualizarALActionPerformed
 
     private void btnAnalisarPseudoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAnalisarPseudoActionPerformed
         String[] words = txtPseudo.getText().split(" ");
+        int finalState;
         for (String word : words) {
-            if (finiteAutomataService.recongnize(finalAutomata, word)) {
-
+            if ((finalState = finiteAutomataService.recongnize(finalAutomata, word)) != -1) {
+                for (String lexeme : finalStateMap.keySet()) {
+                    if (finalState == finalStateMap.get(lexeme)) {
+                        model.addRow(new Object[] {symbolTable.get(lexeme), lexeme});
+                    }
+                }
             } else {
                 model.addRow(new Object[] {word, "Does not exist"});
             }
@@ -253,6 +259,7 @@ public class mainGUI extends javax.swing.JFrame {
     private List<FiniteAutomataDTO> finiteAutomataList;
     private FiniteAutomataDTO finalAutomata;
     private Map<String, String> symbolTable;
+    private Map<String, Integer> finalStateMap;
     private RegularExpressionService regularExpressionService;
     private FiniteAutomataService finiteAutomataService;
 
