@@ -206,6 +206,11 @@ public class mainGUI extends javax.swing.JFrame {
 
     private void btnAnalisarPseudoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAnalisarPseudoActionPerformed
         String[] words = txtPseudo.getText().split(" ");
+        while (model.getRowCount() > 0){
+            for (int i = 0; i < model.getRowCount(); ++i){
+                model.removeRow(i);
+            }
+        }
         int finalState;
         for (String word : words) {
             if ((finalState = finiteAutomataService.recongnize(finalAutomata, word)) != -1) {
