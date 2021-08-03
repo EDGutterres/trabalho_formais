@@ -226,15 +226,21 @@ public class FiniteAutomataService {
 
         int currentState = finiteAutomata.getInitialState();
         int finalState;
+        boolean hasStateTransition = false;
 
         List<TransitionDTO> transitionList = finiteAutomata.getTransitionList();
 
         for (char c : word.toCharArray()) {
+            hasStateTransition = false;
             for (TransitionDTO transition : transitionList) {
                 if (transition.getStateFrom() == currentState && transition.getSymbol().equals(c)) {
                     currentState = transition.getStateTo();
+                    hasStateTransition = true;
                     break;
                 }
+            }
+            if (!hasStateTransition) {
+                return -1;
             }
         }
         finalState = currentState;
