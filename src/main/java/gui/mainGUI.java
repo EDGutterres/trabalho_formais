@@ -228,6 +228,7 @@ public class mainGUI extends javax.swing.JFrame {
         int finalState;
         for (String word : words) {
             boolean hasLexeme = false;
+            List<String> tokensToAdd = new ArrayList<>();
             if ((finalState = finiteAutomataService.recongnize(finalAutomata, word)) != -1) {
                 for (String token : finalStateMap.keySet()) {
                     if (finalStateMap.get(token).contains(finalState)) {
@@ -238,10 +239,13 @@ public class mainGUI extends javax.swing.JFrame {
                             }
                         }
                         if (!hasLexeme) {
-                            model.addRow(new Object[] {word, token});
+                            tokensToAdd.add(token);
                         }
                     }
                 }
+                String stringToAdd = tokensToAdd.toString();
+                stringToAdd = stringToAdd.substring(1, stringToAdd.length() - 1);
+                model.addRow(new Object[]{word, stringToAdd});
             } else {
                 for (int i = 0; i < model.getRowCount(); ++i){
                     if (model.getValueAt(i,0).equals(word)) {
