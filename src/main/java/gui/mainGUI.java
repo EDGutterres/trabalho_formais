@@ -107,8 +107,10 @@ public class mainGUI extends javax.swing.JFrame {
         txtPseudo.setText("func myFunc\n" +
                 "   if true\n" +
                 "      return aabbbab\n" +
+                "   else if condition\n" +
+                "      return baba\n" +
                 "   else\n" +
-                "      return baba");
+                "      return abab");
         jScrollPane3.setViewportView(txtPseudo);
 
         jTable1.setModel(model);
