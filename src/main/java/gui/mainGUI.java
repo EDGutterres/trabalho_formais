@@ -181,9 +181,18 @@ public class mainGUI extends javax.swing.JFrame {
         FiniteAutomataDTO newAutomata;
         boolean modified = false;
         for (String line : txtInputAL.getText().split("\\n")) {
+            if (!line.contains(":")) {
+                continue;
+            }
             String[] splitAux = line.split(":");
+            if (splitAux.length != 2) {
+                continue;
+            }
             String token = splitAux[0].trim();
             String lexeme = splitAux[1].trim();
+            if (token.equals("") || lexeme.equals("")) {
+                continue;
+            }
             if (!symbolTable.containsValue(lexeme)) {
                 if (symbolTable.containsKey(token)) {
                     finiteAutomataMap.remove(token);
