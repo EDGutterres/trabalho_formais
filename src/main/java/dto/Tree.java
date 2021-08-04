@@ -24,7 +24,7 @@ public class Tree {
     FiniteAutomataService finiteAutomataService;
     RegularExpressionService regularExpressionService;
 
-    public FiniteAutomataDTO createTree(String regexp) {
+    public FiniteAutomataDTO createTree(String regexp, String lexeme) {
         finiteAutomataService = new FiniteAutomataService();
         regularExpressionService = new RegularExpressionService();
         this.treeList = new ArrayList<>();
@@ -54,7 +54,7 @@ public class Tree {
         }
 
         regularExpressionService.postOrder(this, this.root);
-        return regularExpressionService.getAutomataFromTree(this.root, this);
+        return regularExpressionService.getAutomataFromTree(this.root, this, lexeme);
     }
 
     public Node splitTree(List<String> elements) {

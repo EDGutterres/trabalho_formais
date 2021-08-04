@@ -21,7 +21,6 @@ public class mainGUI extends javax.swing.JFrame {
      * Creates new form JFrame
      */
     public mainGUI() {
-        finiteAutomataList = new ArrayList<>();
         symbolTable = new HashMap<>();
         regularExpressionService = new RegularExpressionService();
         finiteAutomataService = new FiniteAutomataService();
@@ -191,7 +190,7 @@ public class mainGUI extends javax.swing.JFrame {
                     symbolTable.remove(lexeme);
                 }
                 symbolTable.put(lexeme, token);
-                newAutomata = regularExpressionService.getDFA(token);
+                newAutomata = regularExpressionService.getDFA(token, lexeme);
                 finiteAutomataMap.put(lexeme, newAutomata);
                 modified = true;
             } else {
@@ -200,7 +199,7 @@ public class mainGUI extends javax.swing.JFrame {
                         finiteAutomataMap.remove(oldLexeme);
                         symbolTable.remove(oldLexeme);
                         symbolTable.put(lexeme, token);
-                        newAutomata = regularExpressionService.getDFA(token);
+                        newAutomata = regularExpressionService.getDFA(token, lexeme);
                         finiteAutomataMap.put(lexeme, newAutomata);
                         modified = true;
                         break;
@@ -215,7 +214,7 @@ public class mainGUI extends javax.swing.JFrame {
                 finalAutomata = finiteAutomataService.union(finiteAutomata, finalAutomata);
             }
             finalAutomata = finiteAutomataService.determinize(finalAutomata);
-            finalStateMap = finiteAutomataService.generateFinalStateMap(finalAutomata, symbolTable);
+            finalStateMap = finalAutomata.getAcceptanceLexemaMap();
         }
     }//GEN-LAST:event_btnAtualizarALActionPerformed
 
@@ -231,7 +230,7 @@ public class mainGUI extends javax.swing.JFrame {
             boolean hasToken = false;
             if ((finalState = finiteAutomataService.recongnize(finalAutomata, word)) != -1) {
                 for (String lexeme : finalStateMap.keySet()) {
-                    if (finalState == finalStateMap.get(lexeme)) {
+                    if (finalStateMap.get(lexeme).contains(finalState)) {
                         for (int i = 0; i < model.getRowCount(); ++i){
                             if (model.getValueAt(i,0).equals(symbolTable.get(lexeme))) {
                                 hasToken = true;
@@ -293,11 +292,10 @@ public class mainGUI extends javax.swing.JFrame {
         });
     }
 
-    private List<FiniteAutomataDTO> finiteAutomataList;
     private Map<String, FiniteAutomataDTO> finiteAutomataMap;
     private FiniteAutomataDTO finalAutomata;
     private Map<String, String> symbolTable;
-    private Map<String, Integer> finalStateMap;
+    private Map<String, List<Integer>> finalStateMap;
     private RegularExpressionService regularExpressionService;
     private FiniteAutomataService finiteAutomataService;
 

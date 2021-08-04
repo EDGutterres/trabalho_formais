@@ -1,6 +1,7 @@
 package dto;
 
 import java.util.List;
+import java.util.Map;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,6 +21,6 @@ public class FiniteAutomataDTO {
     private List<Character> alphabet;
     private List<TransitionDTO> transitionList;
     private boolean isNonDeterministic;
-    private Integer lastState;
+    private Map<String, List<Integer>> acceptanceLexemaMap;
 
 }
