@@ -9,6 +9,7 @@ import dto.FiniteAutomataDTO;
 import service.FiniteAutomataService;
 import service.RegularExpressionService;
 
+import javax.swing.*;
 import java.util.*;
 
 /**
@@ -70,7 +71,14 @@ public class mainGUI extends javax.swing.JFrame {
 
         txtInputAL.setColumns(20);
         txtInputAL.setRows(5);
-        txtInputAL.setText("function_token: func\nif_token: if\nelse_token: else\ntrue_token: true\nfalse_token: false");
+        txtInputAL.setText("function_token: func\n" +
+                "true_token: true\n" +
+                "false_token: false\n" +
+                "if_token: if\n" +
+                "else_token: else\n" +
+                "return_token: return\n" +
+                "random_token: aa*(bb*aa*b)*\n" +
+                "random_token2: (&|b)(ab)*(&|a)");
         jScrollPane1.setViewportView(txtInputAL);
 
         btnAtualizarAL.setFont(new java.awt.Font("Liberation Sans", 1, 15)); // NOI18N
@@ -96,7 +104,11 @@ public class mainGUI extends javax.swing.JFrame {
 
         txtPseudo.setColumns(20);
         txtPseudo.setRows(5);
-        txtPseudo.setText("if func myVariable false");
+        txtPseudo.setText("func myFunc\n" +
+                "   if true\n" +
+                "      return aabbbab\n" +
+                "   else\n" +
+                "      return baba");
         jScrollPane3.setViewportView(txtPseudo);
 
         jTable1.setModel(model);
@@ -180,6 +192,8 @@ public class mainGUI extends javax.swing.JFrame {
     private void btnAtualizarALActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAtualizarALActionPerformed
         FiniteAutomataDTO newAutomata;
         boolean modified = false;
+        symbolTable = new HashMap<>();
+        finiteAutomataMap = new HashMap<>();
         for (String line : txtInputAL.getText().split("\\n")) {
             if (!line.contains(":")) {
                 continue;
@@ -224,11 +238,14 @@ public class mainGUI extends javax.swing.JFrame {
             }
             finalAutomata = finiteAutomataService.determinize(finalAutomata);
             finalStateMap = finalAutomata.getAcceptanceTokenMap();
+            JOptionPane.showMessageDialog(null, "AL atualizado com sucesso");
+        } else {
+            JOptionPane.showMessageDialog(null, "Nao ocorreram mudanças no AL");
         }
     }//GEN-LAST:event_btnAtualizarALActionPerformed
 
     private void btnAnalisarPseudoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAnalisarPseudoActionPerformed
-        String[] words = txtPseudo.getText().split(" ");
+        String[] words = txtPseudo.getText().split("\\s+");
         while (model.getRowCount() > 0){
             for (int i = 0; i < model.getRowCount(); ++i){
                 model.removeRow(i);
@@ -252,9 +269,11 @@ public class mainGUI extends javax.swing.JFrame {
                         }
                     }
                 }
-                String stringToAdd = tokensToAdd.toString();
-                stringToAdd = stringToAdd.substring(1, stringToAdd.length() - 1);
-                model.addRow(new Object[]{word, stringToAdd});
+                if (!tokensToAdd.isEmpty()) {
+                    String stringToAdd = tokensToAdd.toString();
+                    stringToAdd = stringToAdd.substring(1, stringToAdd.length() - 1);
+                    model.addRow(new Object[]{word, stringToAdd});
+                }
             } else {
                 for (int i = 0; i < model.getRowCount(); ++i){
                     if (model.getValueAt(i,0).equals(word)) {
