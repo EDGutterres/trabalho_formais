@@ -93,23 +93,6 @@ public class RegularExpressionService {
         return finiteAutomata;
     }
     
-    public static String getInternalRegex(String regex) {
-        String internal_regex = "";
-        List<Character> stack = new ArrayList<>();
-
-        for (char c : regex.toCharArray()) {
-            if(c == '('){
-                stack.add(c);
-            } else if(stack.isEmpty()){
-                return internal_regex;
-            } else {
-                stack.remove(stack.size()-1);
-            }
-            internal_regex += c;
-        }
-    return "";
-    }
-    
     public void generateFirstLastPos(Node node) {
         if(node == null){
             return;

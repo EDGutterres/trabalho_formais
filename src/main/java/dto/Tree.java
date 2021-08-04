@@ -128,13 +128,7 @@ public class Tree {
                 elements_list.add(Character.toString(c));
             }
             if (c == '*') {
-//                if ((elements_list.get(i -1).length() > 1) && (elements_list.size() > 1) ) {
-//                    String elem = elements_list.get(i-1);
-//                    String f = String.format("(%s)*",elem);
-//                    elements_list.add(i-1, f);
-//                } else {
-                    elements_list.add("*");
-                //}
+                elements_list.add("*");
             } else if (c == '('){
                 elements_list.add(internalRegex(regexp.substring(i + temp + 1, regexp.length()-1)));
                 temp += elements_list.get(elements_list.size() - 1).length() + 1;
