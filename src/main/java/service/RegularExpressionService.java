@@ -12,12 +12,12 @@ import java.util.stream.Stream;
 
 public class RegularExpressionService {
 
-    public FiniteAutomataDTO getAutomataFromTree(Node node, Tree tree, String lexeme) {
+    public FiniteAutomataDTO getAutomataFromTree(Node node, Tree tree, String token) {
         FiniteAutomataDTO finiteAutomata = new FiniteAutomataDTO();
         List<Character> alphabet = new ArrayList<>(tree.getAlphabet());
         Map<Integer, List<Integer>> stateListMap = new HashMap<>();
         Map<Integer, Boolean> modifiedStatesMap = new HashMap<>();
-        Map<String, List<Integer>> acceptanceLexemeMap = new HashMap<>();
+        Map<String, List<Integer>> acceptanceTokenMap = new HashMap<>();
         Integer initialState = 0;
         Integer currentState = 0;
         Integer newState = 0;
@@ -88,8 +88,8 @@ public class RegularExpressionService {
         finiteAutomata.setAcceptanceStates(acceptanceStates);
         finiteAutomata.setAlphabet(alphabet);
         finiteAutomata.setNonDeterministic(false);
-        acceptanceLexemeMap.put(lexeme, acceptanceStates);
-        finiteAutomata.setAcceptanceLexemaMap(acceptanceLexemeMap);
+        acceptanceTokenMap.put(token, acceptanceStates);
+        finiteAutomata.setAcceptanceTokenMap(acceptanceTokenMap);
         return finiteAutomata;
     }
     
@@ -193,20 +193,20 @@ public class RegularExpressionService {
         return node;
     }
 
-    public FiniteAutomataDTO getDFA(String token, String lexeme) {
+    public FiniteAutomataDTO getDFA(String lexeme, String token) {
         Tree tree = new Tree();
         List<Character> characterList = new ArrayList<>();
-        List<Character> reservedTokens = new ArrayList<>();
-        reservedTokens.add('|');
-        reservedTokens.add('*');
-        reservedTokens.add('(');
-        reservedTokens.add(')');
-        for (char c : token.toCharArray()) {
-            if (!characterList.contains(c) && !reservedTokens.contains(c)) {
+        List<Character> reservedCharacters = new ArrayList<>();
+        reservedCharacters.add('|');
+        reservedCharacters.add('*');
+        reservedCharacters.add('(');
+        reservedCharacters.add(')');
+        for (char c : lexeme.toCharArray()) {
+            if (!characterList.contains(c) && !reservedCharacters.contains(c)) {
                 characterList.add(c);
             }
         }
         tree.setAlphabet(characterList);
-        return tree.createTree(token + "#", lexeme);
+        return tree.createTree(lexeme + "#", token);
     }
 }

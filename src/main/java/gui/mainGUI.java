@@ -100,8 +100,8 @@ public class mainGUI extends javax.swing.JFrame {
         jScrollPane3.setViewportView(txtPseudo);
 
         jTable1.setModel(model);
-        model.addColumn("Token");
         model.addColumn("Lexeme");
+        model.addColumn("Token");
 
         jScrollPane4.setViewportView(jTable1);
 
@@ -182,25 +182,25 @@ public class mainGUI extends javax.swing.JFrame {
         boolean modified = false;
         for (String line : txtInputAL.getText().split("\\n")) {
             String[] splitAux = line.split(":");
-            String lexeme = splitAux[0].trim();
-            String token = splitAux[1].trim();
-            if (!symbolTable.containsValue(token)) {
-                if (symbolTable.containsKey(lexeme)) {
-                    finiteAutomataMap.remove(lexeme);
-                    symbolTable.remove(lexeme);
+            String token = splitAux[0].trim();
+            String lexeme = splitAux[1].trim();
+            if (!symbolTable.containsValue(lexeme)) {
+                if (symbolTable.containsKey(token)) {
+                    finiteAutomataMap.remove(token);
+                    symbolTable.remove(token);
                 }
-                symbolTable.put(lexeme, token);
-                newAutomata = regularExpressionService.getDFA(token, lexeme);
-                finiteAutomataMap.put(lexeme, newAutomata);
+                symbolTable.put(token, lexeme);
+                newAutomata = regularExpressionService.getDFA(lexeme, token);
+                finiteAutomataMap.put(token, newAutomata);
                 modified = true;
             } else {
-                for (String oldLexeme : symbolTable.keySet()) {
-                    if (symbolTable.get(oldLexeme).equals(token) && !Objects.equals(oldLexeme, lexeme)) {
-                        finiteAutomataMap.remove(oldLexeme);
-                        symbolTable.remove(oldLexeme);
-                        symbolTable.put(lexeme, token);
-                        newAutomata = regularExpressionService.getDFA(token, lexeme);
-                        finiteAutomataMap.put(lexeme, newAutomata);
+                for (String oldToken : symbolTable.keySet()) {
+                    if (symbolTable.get(oldToken).equals(lexeme) && !Objects.equals(oldToken, token)) {
+                        finiteAutomataMap.remove(oldToken);
+                        symbolTable.remove(oldToken);
+                        symbolTable.put(token, lexeme);
+                        newAutomata = regularExpressionService.getDFA(lexeme, token);
+                        finiteAutomataMap.put(token, newAutomata);
                         modified = true;
                         break;
                     }
@@ -214,7 +214,7 @@ public class mainGUI extends javax.swing.JFrame {
                 finalAutomata = finiteAutomataService.union(finiteAutomata, finalAutomata);
             }
             finalAutomata = finiteAutomataService.determinize(finalAutomata);
-            finalStateMap = finalAutomata.getAcceptanceLexemaMap();
+            finalStateMap = finalAutomata.getAcceptanceTokenMap();
         }
     }//GEN-LAST:event_btnAtualizarALActionPerformed
 
@@ -227,29 +227,29 @@ public class mainGUI extends javax.swing.JFrame {
         }
         int finalState;
         for (String word : words) {
-            boolean hasToken = false;
+            boolean hasLexeme = false;
             if ((finalState = finiteAutomataService.recongnize(finalAutomata, word)) != -1) {
-                for (String lexeme : finalStateMap.keySet()) {
-                    if (finalStateMap.get(lexeme).contains(finalState)) {
+                for (String token : finalStateMap.keySet()) {
+                    if (finalStateMap.get(token).contains(finalState)) {
                         for (int i = 0; i < model.getRowCount(); ++i){
-                            if (model.getValueAt(i,0).equals(symbolTable.get(lexeme))) {
-                                hasToken = true;
+                            if (model.getValueAt(i,0).equals(word)) {
+                                hasLexeme = true;
                                 break;
                             }
                         }
-                        if (!hasToken) {
-                            model.addRow(new Object[] {symbolTable.get(lexeme), lexeme});
+                        if (!hasLexeme) {
+                            model.addRow(new Object[] {word, token});
                         }
                     }
                 }
             } else {
                 for (int i = 0; i < model.getRowCount(); ++i){
                     if (model.getValueAt(i,0).equals(word)) {
-                        hasToken = true;
+                        hasLexeme = true;
                         break;
                     }
                 }
-                if (!hasToken) {
+                if (!hasLexeme) {
                     model.addRow(new Object[] {word, "Does not exist"});
                 }
             }

@@ -30,7 +30,7 @@ public class RegularExpressionServiceTest {
         characterList.add('b');
         //characterList.add('&');
         tree.setAlphabet(characterList);
-        FiniteAutomataDTO finiteAutomata = tree.createTree("aa*(bb*aa*b)*#", "novoLexema");
+        FiniteAutomataDTO finiteAutomata = tree.createTree("aa*(bb*aa*b)*#", "novoToken");
         Assert.assertFalse(finiteAutomata.isNonDeterministic());
     }
 

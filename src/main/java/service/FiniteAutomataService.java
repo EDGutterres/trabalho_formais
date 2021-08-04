@@ -40,9 +40,9 @@ public class FiniteAutomataService {
         finalFiniteAutomata.getTransitionList().add(0, new TransitionDTO(0, finiteAutomata2.getInitialState(), '&'));
         finiteAutomata1.getAcceptanceStates().forEach(state -> finalFiniteAutomata.getTransitionList().add(new TransitionDTO(state, finalState, '&')));
         finiteAutomata2.getAcceptanceStates().forEach(state -> finalFiniteAutomata.getTransitionList().add(new TransitionDTO(state, finalState, '&')));
-        finalFiniteAutomata.setAcceptanceLexemaMap(new HashMap<>(finiteAutomata1.getAcceptanceLexemaMap()));
-        finiteAutomata2.getAcceptanceLexemaMap().forEach(
-                (key, value) -> finalFiniteAutomata.getAcceptanceLexemaMap().merge( key, value, (v1, v2) -> {
+        finalFiniteAutomata.setAcceptanceTokenMap(new HashMap<>(finiteAutomata1.getAcceptanceTokenMap()));
+        finiteAutomata2.getAcceptanceTokenMap().forEach(
+                (key, value) -> finalFiniteAutomata.getAcceptanceTokenMap().merge( key, value, (v1, v2) -> {
                     ArrayList<Integer> toReturn = new ArrayList<>(v1);
                     for (Integer valor : v2){
                         if (!toReturn.contains(valor))
@@ -66,9 +66,9 @@ public class FiniteAutomataService {
         for (int i = 0; i < finiteAutomata.getAcceptanceStates().size(); i++) {
             finiteAutomata.getAcceptanceStates().set(i, finiteAutomata.getAcceptanceStates().get(i)+shift);
         }
-        for (String lexeme : finiteAutomata.getAcceptanceLexemaMap().keySet()) {
-            for (int i = 0; i < finiteAutomata.getAcceptanceLexemaMap().get(lexeme).size(); i++) {
-                finiteAutomata.getAcceptanceLexemaMap().get(lexeme).set(i, finiteAutomata.getAcceptanceLexemaMap().get(lexeme).get(i)+shift);
+        for (String token : finiteAutomata.getAcceptanceTokenMap().keySet()) {
+            for (int i = 0; i < finiteAutomata.getAcceptanceTokenMap().get(token).size(); i++) {
+                finiteAutomata.getAcceptanceTokenMap().get(token).set(i, finiteAutomata.getAcceptanceTokenMap().get(token).get(i)+shift);
             }
         }
         finiteAutomata.setInitialState(finiteAutomata.getInitialState() + shift);
@@ -160,25 +160,25 @@ public class FiniteAutomataService {
                 }
             }
         }
-        Map<String, List<Integer>> newLexemeAcceptanceMap = new HashMap<>(finiteAutomata.getAcceptanceLexemaMap());
+        Map<String, List<Integer>> newTokenAcceptanceMap = new HashMap<>(finiteAutomata.getAcceptanceTokenMap());
 
-        for (String lexeme : finiteAutomata.getAcceptanceLexemaMap().keySet()) {
-            List<Integer> newLexemeAcceptanceList = new ArrayList<>();
-            for (Integer acceptanceState : finiteAutomata.getAcceptanceLexemaMap().get(lexeme)) {
+        for (String token : finiteAutomata.getAcceptanceTokenMap().keySet()) {
+            List<Integer> newTokenAcceptanceList = new ArrayList<>();
+            for (Integer acceptanceState : finiteAutomata.getAcceptanceTokenMap().get(token)) {
                 for (Integer state : stateListMap.keySet()) {
                     if (stateListMap.get(state).contains(acceptanceState)) {
-                        newLexemeAcceptanceList.add(state);
+                        newTokenAcceptanceList.add(state);
                     }
                 }
             }
-            newLexemeAcceptanceMap.put(lexeme, newLexemeAcceptanceList);
+            newTokenAcceptanceMap.put(token, newTokenAcceptanceList);
         }
 
         determinizedAutomata.setStateList(newStateList);
         determinizedAutomata.setNStates(newStateList.size());
         determinizedAutomata.setInitialState(newInitialState);
         determinizedAutomata.setTransitionList(newTransitionList);
-        determinizedAutomata.setAcceptanceLexemaMap(newLexemeAcceptanceMap);
+        determinizedAutomata.setAcceptanceTokenMap(newTokenAcceptanceMap);
         determinizedAutomata.setAlphabet(finiteAutomata.getAlphabet());
 
     }
@@ -234,7 +234,7 @@ public class FiniteAutomataService {
         List<Integer> acceptanceStates = new ArrayList<>(finiteAutomata.getAcceptanceStates());
         List<Character> alphabet = new ArrayList<>(finiteAutomata.getAlphabet());
         List<TransitionDTO> transitionList = new ArrayList<>();
-        Map<String, List<Integer>> acceptanceLexemaMap = new HashMap<>();
+        Map<String, List<Integer>> acceptanceTokenMap = new HashMap<>();
         for (TransitionDTO transition : finiteAutomata.getTransitionList()) {
             TransitionDTO newTransition = new TransitionDTO();
             newTransition.setStateFrom(transition.getStateFrom());
@@ -242,8 +242,8 @@ public class FiniteAutomataService {
             newTransition.setSymbol(transition.getSymbol());
             transitionList.add(newTransition);
         }
-        for (String key : finiteAutomata.getAcceptanceLexemaMap().keySet()) {
-            acceptanceLexemaMap.put(key, new ArrayList<>(finiteAutomata.getAcceptanceLexemaMap().get(key)));
+        for (String key : finiteAutomata.getAcceptanceTokenMap().keySet()) {
+            acceptanceTokenMap.put(key, new ArrayList<>(finiteAutomata.getAcceptanceTokenMap().get(key)));
         }
         boolean isNonDeterministic = finiteAutomata.isNonDeterministic();
 
@@ -254,7 +254,7 @@ public class FiniteAutomataService {
         copyFiniteAutomata.setAlphabet(alphabet);
         copyFiniteAutomata.setTransitionList(transitionList);
         copyFiniteAutomata.setNonDeterministic(isNonDeterministic);
-        copyFiniteAutomata.setAcceptanceLexemaMap(acceptanceLexemaMap);
+        copyFiniteAutomata.setAcceptanceTokenMap(acceptanceTokenMap);
 
         return copyFiniteAutomata;
     }
@@ -285,19 +285,5 @@ public class FiniteAutomataService {
             return finalState;
         }
         return -1;
-    }
-
-    public Map<String, Integer> generateFinalStateMap(FiniteAutomataDTO finalAutomata, Map<String, String> symbolTable) {
-        Map<String, Integer> finalStateMap = new HashMap<>();
-        int finalState;
-        String token;
-
-        for (String lexeme : symbolTable.keySet()) {
-            token = symbolTable.get(lexeme);
-            finalState = recongnize(finalAutomata, token);
-            finalStateMap.put(lexeme, finalState);
-        }
-
-        return finalStateMap;
     }
 }

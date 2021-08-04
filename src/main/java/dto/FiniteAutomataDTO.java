@@ -21,6 +21,6 @@ public class FiniteAutomataDTO {
     private List<Character> alphabet;
     private List<TransitionDTO> transitionList;
     private boolean isNonDeterministic;
-    private Map<String, List<Integer>> acceptanceLexemaMap;
+    private Map<String, List<Integer>> acceptanceTokenMap;
 
 }
