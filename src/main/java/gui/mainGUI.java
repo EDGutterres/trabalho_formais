@@ -77,8 +77,8 @@ public class mainGUI extends javax.swing.JFrame {
                 "if_token: if\n" +
                 "else_token: else\n" +
                 "return_token: return\n" +
-                "random_token: aa*(bb*aa*b)*\n" +
-                "random_token2: (&|b)(ab)*(&|a)");
+                "token_1: aa*(bb*aa*b)*\n" +
+                "token_2: (&|b)(ab)*(&|a)");
         jScrollPane1.setViewportView(txtInputAL);
 
         btnAtualizarAL.setFont(new java.awt.Font("Liberation Sans", 1, 15)); // NOI18N
