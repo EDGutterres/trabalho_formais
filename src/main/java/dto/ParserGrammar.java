@@ -5,7 +5,7 @@ import java.util.*;
 public class ParserGrammar {
 
     String grammar;
-    HashMap<String, String> productions;
+    HashMap<String, ArrayList<String>> productions = new HashMap<String, ArrayList<String>>();
     String start;
     Set<String> terminals = new HashSet<String>();
     Set<String> nonTerminals = new HashSet<String>();
@@ -35,13 +35,15 @@ public class ParserGrammar {
             this.nonTerminals.add(head);
 
             String[] splitBodies = bodies.split("\\|");
+            ArrayList<String> bodyTemp = new ArrayList<String>();
 
-            for (String body: splitBodies) {
+            for (String body : splitBodies) {
                 if (body.contains(Character.toString('&')) && !body.equals(Character.toString('&')) ) {
                     throw new Exception("Símbolo & não permitido.");
                 }
 
-                this.productions.put(head, body);
+                bodyTemp.add(body);
+                this.productions.put(head, bodyTemp);
 
                 String[] splitBody = body.split("(?!^)");
 
