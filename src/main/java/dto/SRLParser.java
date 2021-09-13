@@ -51,6 +51,7 @@ public class SRLParser {
             return true;
         }
     }
+
     public void firstFollow(ParserGrammar grammar) {
 
         HashMap<String, Set<String>> first = new HashMap<>();
@@ -119,19 +120,66 @@ public class SRLParser {
                         } else {
                             aux = first.get(symbol);
                         }
-
                     }
-
                  }
             }
-
             if (!updated) {
                 return;
+            }
+        }
+    }
+
+    public HashMap<String, Set<String>> closure(HashMap<String, Set<String>> item) {
+        HashMap<String, Set<String>> j = new HashMap<String, Set<String>>(item);
+
+        while (true) {
+            int item_size = j.size();
+
+            for (Map.Entry<String, Set<String>> set : j.entrySet()) {
+                for (String body : set.getValue()) {
+                    if (body.contains(".")) {
+                        char symbolAfterDot = body.charAt(body.indexOf('.') + 1);
+
+                        if (this.gPrime.nonTerminals.contains(symbolAfterDot)) {
+                            for (String gBody : this.gPrime.productions.get(symbolAfterDot)) {
+                                if (gBody.equals("&")) {
+                                    j.put(symbolAfterDot, ".");
+                                } else {
+                                    j.put(symbolAfterDot, ('.',) + gBody);
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+            if (item_size == j.size()) {
+                return j;
+
             }
         }
 
     }
 
+    public HashMap<String, String> goTo(HashMap<String, Set<String> i, char x) {
+        HashMap<String, String> goTo;
+        for (Map.Entry<String, Set<String>> set : i.entrySet()) {
+            for (String body : set.getValue()) {
+                if (body.contains(".")) {
+                    int dotPosition = body.indexOf(".");
 
+                    if (body.charAt(dotPosition + 1) == x) {
+                        replaced_dot_body = body[:dot_position] + (X, '.') + body[dot_position + 2:]
+
+                        for closureHeads, closureBodies in self.CLOSURE({head: {replaced_dot_body}}).items():
+                            goto.setdefault(closureHeads, set()).update(closureBodies)
+
+                    }
+                }
+            }
+
+        }
+        return goTo;
+    }
 
 }
